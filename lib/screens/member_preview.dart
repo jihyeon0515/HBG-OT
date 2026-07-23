@@ -84,25 +84,54 @@ class MemberFormView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(children: [
       FormSection(title: '① 기본 정보', children: [
-        Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Expanded(child: _chips('구분', 'member_type', memberTypeOptions, multi: false)),
-          const SizedBox(width: 8),
-          Expanded(child: _chips('희망종목', 'jongmok', jongmokOptions, multi: false)),
-        ]),
-        Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Expanded(flex: 3, child: _text('이름', 'name')),
-          const SizedBox(width: 8),
-          Expanded(flex: 4, child: _text('연락처', 'phone', fit: true)),
-          const SizedBox(width: 8),
-          Expanded(flex: 2, child: _chips('성별', 'gender', genders, multi: false)),
-          const SizedBox(width: 8),
-          Expanded(flex: 2, child: _text('나이', 'age')),
-        ]),
-        Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Expanded(child: _text('직업', 'job')),
-          const SizedBox(width: 8),
-          Expanded(child: _text('운동 시간대', 'etime')),
-        ]),
+        LayoutBuilder(builder: (ctx, c) {
+          // 화면(칸) 폭이 좁으면(모바일) 줄을 나눠 성별 칩이 세로로 눌리지 않게 함
+          final narrow = c.maxWidth < 560;
+          final typeRow = Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(child: _chips('구분', 'member_type', memberTypeOptions, multi: false)),
+                const SizedBox(width: 8),
+                Expanded(child: _chips('희망종목', 'jongmok', jongmokOptions, multi: false)),
+              ]);
+          final jobRow = Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(child: _text('직업', 'job')),
+                const SizedBox(width: 8),
+                Expanded(child: _text('운동 시간대', 'etime')),
+              ]);
+          if (narrow) {
+            return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  typeRow,
+                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Expanded(flex: 3, child: _text('이름', 'name')),
+                    const SizedBox(width: 8),
+                    Expanded(flex: 2, child: _text('나이', 'age')),
+                  ]),
+                  _text('연락처', 'phone', fit: true),
+                  _chips('성별', 'gender', genders, multi: false),
+                  jobRow,
+                ]);
+          }
+          return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                typeRow,
+                Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Expanded(flex: 3, child: _text('이름', 'name')),
+                  const SizedBox(width: 8),
+                  Expanded(flex: 4, child: _text('연락처', 'phone', fit: true)),
+                  const SizedBox(width: 8),
+                  Expanded(flex: 2, child: _chips('성별', 'gender', genders, multi: false)),
+                  const SizedBox(width: 8),
+                  Expanded(flex: 2, child: _text('나이', 'age')),
+                ]),
+                jobRow,
+              ]);
+        }),
       ]),
       FormSection(title: '② 방문 계기 & 운동목적 (중복선택)', children: [
         _chips('헬스보이짐 분당정자점을 방문하게 된 계기', 'visit_reason', visitReasonOptions),
