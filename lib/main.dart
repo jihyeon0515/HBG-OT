@@ -38,7 +38,7 @@ class HbGymApp extends StatelessWidget {
         return s;
       },
       child: MaterialApp(
-        title: '헬스보이짐 OT 시스템',
+        title: '헬스보이짐 분당정자점',
         debugShowCheckedModeBanner: false,
         theme: buildTheme(),
         home: const RootShell(),
@@ -55,21 +55,9 @@ class RootShell extends StatelessWidget {
     final app = context.watch<AppState>();
     return Scaffold(
       appBar: AppBar(
-        title: const Text('🏋️ 헬스보이짐 OT'),
+        title: const Text('🏋️ 헬스보이짐 분당정자점'),
         actions: [
           if (app.role == Role.trainer) _trainerPicker(context, app),
-          if (app.role == Role.admin && app.inboxCount > 0)
-            Center(
-              child: Container(
-                margin: const EdgeInsets.only(right: 6),
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                    color: Colors.redAccent,
-                    borderRadius: BorderRadius.circular(20)),
-                child: Text('접수 ${app.inboxCount}',
-                    style: const TextStyle(fontSize: 12)),
-              ),
-            ),
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert),
             onSelected: (v) => _menu(context, app, v),
@@ -172,6 +160,8 @@ class RootShell extends StatelessWidget {
     if (v == 'sample') {
       app.createSubmission({
         'name': '김민수',
+        'member_type': '신규',
+        'jongmok': '헬스',
         'gender': '남',
         'age': '34',
         'job': '사무직',

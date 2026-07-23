@@ -3,9 +3,15 @@ library;
 
 /// 담당 FC / 트레이너 (실제 이름으로 교체하세요)
 const List<String> fcList = ['정지현'];
-const List<String> trainerList = ['박트레이너', '김코치', '이트레이너'];
+const List<String> trainerList = ['박트레이너', '김코치', '이트레이너', '정트레이너', '최코치'];
 
 const List<String> genders = ['남', '여'];
+
+/// 회원 구분
+const List<String> memberTypeOptions = ['신규', '리뉴', '체험'];
+
+/// 종목
+const List<String> jongmokOptions = ['헬스', '필라'];
 
 const List<String> inflowOptions = [
   '직장', '거주지', '인터넷', '파워링크', '인스타', '외부간판',

@@ -6,6 +6,7 @@ import '../models/options.dart';
 import '../models/submission.dart';
 import '../theme.dart';
 import '../widgets/form_fields.dart';
+import 'member_preview.dart';
 import 'ot_preview.dart';
 import 'submission_view.dart';
 
@@ -63,8 +64,9 @@ class _TrainerOtPageState extends State<TrainerOtPage> {
                     fontWeight: FontWeight.w900, fontSize: 15, color: kYellow)),
           ]),
         ),
-        MemberInfoSections(data: data),
-        const SizedBox(height: 6),
+        const SizedBox(height: 8),
+        MemberFormView(data: data),
+        const SizedBox(height: 4),
         const Divider(thickness: 1.5),
         const Padding(
           padding: EdgeInsets.only(top: 6, bottom: 2),
@@ -76,20 +78,27 @@ class _TrainerOtPageState extends State<TrainerOtPage> {
     );
   }
 
-  void _save({required bool complete}) {
+  // outcome null = 임시저장, success/failure = OT 완료 + 결과 지정
+  void _save({SubStatus? outcome}) {
     // 프로그램명 = 운동목적 자동
     if ((data['your_goal'] ?? '').toString().isNotEmpty) {
       data['prog_title'] = data['your_goal'];
     }
     final app = context.read<AppState>();
-    if (complete) {
+    if (outcome != null) {
       app.completeSubmission(widget.id, data);
+      app.setOutcome(widget.id, outcome); // 관리자 페이지에 성공/실패 반영
     } else {
       app.saveTrainerWork(widget.id, data);
     }
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(complete ? '완료 처리되었습니다.' : '임시저장되었습니다.')));
-    if (complete) Navigator.pop(context);
+    final msg = outcome == null
+        ? '임시저장되었습니다.'
+        : outcome == SubStatus.success
+            ? '성공으로 완료되었습니다.'
+            : '실패로 완료되었습니다.';
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(msg)));
+    if (outcome != null) Navigator.pop(context);
   }
 
   @override
@@ -104,7 +113,7 @@ class _TrainerOtPageState extends State<TrainerOtPage> {
             icon: const Icon(Icons.assignment_ind, color: kYellow),
           ),
           TextButton(
-            onPressed: () => _save(complete: false),
+            onPressed: () => _save(),
             child: const Text('임시저장', style: TextStyle(color: kYellow)),
           ),
         ],
@@ -167,15 +176,40 @@ class _TrainerOtPageState extends State<TrainerOtPage> {
             trainerName: context.read<AppState>().currentTrainer ?? '',
           ),
           const SizedBox(height: 16),
-          SizedBox(
-            height: 52,
-            child: FilledButton.icon(
-              style: kYellowCta,
-              onPressed: () => _save(complete: true),
-              icon: const Icon(Icons.check_circle),
-              label: const Text('OT 작성 완료'),
+          const Text('OT 완료 처리 — 성공/실패를 선택하세요',
+              style: TextStyle(fontWeight: FontWeight.w800, color: kMuted, fontSize: 13)),
+          const SizedBox(height: 6),
+          Row(children: [
+            Expanded(
+              child: SizedBox(
+                height: 52,
+                child: FilledButton.icon(
+                  style: FilledButton.styleFrom(
+                      backgroundColor: const Color(0xFF27AE60),
+                      foregroundColor: Colors.white,
+                      textStyle: const TextStyle(fontWeight: FontWeight.w900, fontSize: 15)),
+                  onPressed: () => _save(outcome: SubStatus.success),
+                  icon: const Icon(Icons.check_circle),
+                  label: const Text('성공으로 완료'),
+                ),
+              ),
             ),
-          ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: SizedBox(
+                height: 52,
+                child: FilledButton.icon(
+                  style: FilledButton.styleFrom(
+                      backgroundColor: const Color(0xFFEB5757),
+                      foregroundColor: Colors.white,
+                      textStyle: const TextStyle(fontWeight: FontWeight.w900, fontSize: 15)),
+                  onPressed: () => _save(outcome: SubStatus.failure),
+                  icon: const Icon(Icons.cancel),
+                  label: const Text('실패로 완료'),
+                ),
+              ),
+            ),
+          ]),
           const SizedBox(height: 24),
         ],
       ),

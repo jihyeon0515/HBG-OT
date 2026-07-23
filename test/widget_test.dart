@@ -8,6 +8,6 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     await tester.pumpWidget(const HbGymApp());
     await tester.pump();
-    expect(find.textContaining('헬스보이짐 OT'), findsWidgets);
+    expect(find.textContaining('헬스보이짐'), findsWidgets);
   });
 }

@@ -81,6 +81,15 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// 데이터 일부만 갱신(상태 변경 없음) — 관리자 특이사항 편집 등
+  void updateData(String id, Map<String, dynamic> patch) {
+    final s = _byId(id);
+    if (s == null) return;
+    s.data.addAll(patch);
+    _persist();
+    notifyListeners();
+  }
+
   /// 완료 건의 결과(성공/실패) 지정
   void setOutcome(String id, SubStatus outcome) {
     final s = _byId(id);
@@ -150,11 +159,19 @@ class AppState extends ChangeNotifier {
       'persona': ['운동에 지루함을 쉽게느낀다'],
       'member_note': '오른쪽 무릎에 통증이 가끔 있어요. 저녁 시간대를 선호합니다.',
     };
-    createSubmission({...base, 'name': '이접수'});
-    final s2 = createSubmission({...base, 'name': '박배정'});
-    final s3 = createSubmission({...base, 'name': '최완료', 'your_goal': '체지방 감소'});
-    assignTrainer(s2.id, trainerListDefault);
-    assignTrainer(s3.id, trainerListDefault);
+    createSubmission(
+        {...base, 'name': '이접수', 'member_type': '신규', 'jongmok': '헬스'});
+    final s2 = createSubmission(
+        {...base, 'name': '박배정', 'member_type': '리뉴', 'jongmok': '필라'});
+    final s3 = createSubmission({
+      ...base,
+      'name': '최완료',
+      'member_type': '체험',
+      'jongmok': '헬스',
+      'your_goal': '체지방 감소'
+    });
+    assignTrainer(s2.id, '박트레이너');
+    assignTrainer(s3.id, '김코치');
     completeSubmission(s3.id, {
       'your_goal': '체지방 감소',
       'prog_title': '체지방 감소',
@@ -165,18 +182,28 @@ class AppState extends ChangeNotifier {
       'rec_days': '4', 'set_per_day': '15', 'time_min': '60', 'target_hr': '130~150',
       's1_name': '벤치프레스', 's1_w1': '40', 's1_w2': '50', 's1_rep': '10', 's1_lv': '중',
       'os1_date': '2026-07-23', 'os1_time': '19:00', 'os1_prog': '스쿼트 / 레그프레스',
-      'os1_cardio': ['런닝머신'], 'os1_ctime': '20분', 'os1_msign': '최완료', 'os1_asign': trainerListDefault,
+      'os1_cardio': ['런닝머신'], 'os1_ctime': '20분', 'os1_msign': '최완료', 'os1_asign': '김코치',
       'trainer_note': '무릎 통증 고려해 하체 고중량은 4주 후부터 진행.',
     });
-    setOutcome(s3.id, SubStatus.success); // 데모: 완료 → 성공 처리
+    setOutcome(s3.id, SubStatus.success); // 데모: 김코치가 성공으로 완료
     // 진행중 예시 (2차 진행중)
-    final s4 = createSubmission({...base, 'name': '정진행'});
-    assignTrainer(s4.id, trainerListDefault);
+    final s4 = createSubmission(
+        {...base, 'name': '정진행', 'member_type': '신규', 'jongmok': '필라'});
+    assignTrainer(s4.id, '이트레이너');
     saveTrainerWork(s4.id, {
       'analysis': '자세 교정 진행 중',
       'os1_date': '2026-07-20', 'os1_time': '19:00', 'os1_prog': '스쿼트 / 레그프레스',
       'os2_date': '2026-07-24', 'os2_time': '20:00', 'os2_prog': '벤치프레스',
     });
+    // 실패 예시 (정트레이너가 실패로 완료)
+    final s5 = createSubmission(
+        {...base, 'name': '한실패', 'member_type': '체험', 'jongmok': '헬스'});
+    assignTrainer(s5.id, '정트레이너');
+    completeSubmission(s5.id, {
+      'analysis': '체험 종료 후 미등록',
+      'os1_date': '2026-07-22', 'os1_time': '18:00', 'os1_prog': '전신 순환 운동',
+    });
+    setOutcome(s5.id, SubStatus.failure);
   }
 }
 

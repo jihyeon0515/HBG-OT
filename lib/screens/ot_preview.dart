@@ -5,6 +5,83 @@ const _blue = Color(0xFF0B3F8F);
 const _line = Color(0xFF222222);
 const _hdrFill = Color(0xFFFFF3C4); // 옅은 노랑 라벨칸
 
+/// 문진표(회원/OT)를 작은 썸네일로 보여주고, 탭하면 전체화면(세로 스크롤)으로 표시.
+/// builder 로 매번 새 위젯을 만들어 썸네일/전체화면에서 각각 독립적으로 렌더한다.
+class PreviewThumbnail extends StatelessWidget {
+  final Widget Function() builder;
+  final String title;
+  final double naturalWidth;
+  const PreviewThumbnail(
+      {super.key,
+      required this.builder,
+      required this.title,
+      this.naturalWidth = 560});
+
+  void _openFull(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (ctx) {
+          final w = MediaQuery.of(ctx).size.width;
+          final formW = w < (naturalWidth + 40) ? w - 16 : naturalWidth;
+          return Scaffold(
+            backgroundColor: const Color(0xFFECECEA),
+            appBar: AppBar(title: Text(title)),
+            body: Scrollbar(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Center(child: SizedBox(width: formW, child: builder())),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      GestureDetector(
+        onTap: () => _openFull(context),
+        child: Container(
+          width: 300,
+          height: 300,
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(color: kBorder),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Stack(children: [
+            Positioned.fill(
+              child: FittedBox(
+                fit: BoxFit.fitWidth,
+                alignment: Alignment.topCenter,
+                clipBehavior: Clip.hardEdge,
+                child: SizedBox(width: naturalWidth, child: builder()),
+              ),
+            ),
+            Center(
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.55),
+                    shape: BoxShape.circle),
+                child: const Icon(Icons.zoom_in, color: Colors.white, size: 26),
+              ),
+            ),
+          ]),
+        ),
+      ),
+      const SizedBox(height: 5),
+      const Text('탭하여 크게 보기',
+          style: TextStyle(fontSize: 12, color: kMuted)),
+    ]);
+  }
+}
+
 /// 오티문진표(양식) 미리보기 — 로고·인체 이미지 포함, 입력값 실시간 반영
 class OtFormPreview extends StatelessWidget {
   final Map<String, dynamic> data;
@@ -290,7 +367,10 @@ class OtFormPreview extends StatelessWidget {
           Container(
             decoration: BoxDecoration(border: Border.all(color: const Color(0xFFDDDDDD))),
             padding: const EdgeInsets.all(6),
-            child: Image.asset('assets/body.jpg', fit: BoxFit.contain),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 300),
+              child: Image.asset('assets/body.jpg', fit: BoxFit.contain),
+            ),
           ),
           _memo('checkpoint', '- Check point'),
           const SizedBox(height: 8),
