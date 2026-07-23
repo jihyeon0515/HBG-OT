@@ -164,13 +164,16 @@ class _TrainerOtPageState extends State<TrainerOtPage> {
                 style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: kInk)),
           ]),
           const SizedBox(height: 4),
-          const Text('입력하신 내용이 아래 양식에 실시간 반영됩니다.',
+          const Text('입력하신 내용이 실시간 반영됩니다. 미리보기를 누르면 전체 화면으로 볼 수 있습니다.',
               style: TextStyle(fontSize: 12, color: kMuted)),
           const SizedBox(height: 10),
-          OtFormPreview(
-            data: data,
-            memberName: memberName,
-            trainerName: context.read<AppState>().currentTrainer ?? '',
+          PreviewThumbnail(
+            title: '$memberName · OT 문진표',
+            builder: () => OtFormPreview(
+              data: data,
+              memberName: memberName,
+              trainerName: context.read<AppState>().currentTrainer ?? '',
+            ),
           ),
           const SizedBox(height: 16),
           const Text('OT 완료 처리 — 성공/실패를 선택하세요',
