@@ -725,7 +725,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   Widget _rowFor(BuildContext context, int no, Submission s, List<double> w,
       {required bool last}) {
     final type = (s.data['member_type'] ?? '신규').toString();
-    const typeColors = {'신규': 0xFF2F80ED, '리뉴': 0xFF9B51E0, '체험': 0xFFF2994A};
+    const typeColors = {'신규': 0xFF2F80ED, '리뉴': 0xFF9B51E0};
     final jong = (s.data['jongmok'] ?? '').toString();
     const jongColors = {'헬스': 0xFF2D9CDB, '필라': 0xFFEB5FA0};
     final prog = _progressInfo(s);

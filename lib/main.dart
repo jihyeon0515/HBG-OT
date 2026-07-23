@@ -15,7 +15,16 @@ void main() {
 /// URL 파라미터로 데모 상태 지정 (?seed=1&role=admin|trainer&trainer=이름)
 void _applyQuery(AppState s) {
   final q = Uri.base.queryParameters;
-  if (q['seed'] == '1' && s.submissions.isEmpty) s.seedDemo();
+  // ?reset=1 (또는 ?seed=reset): 저장된 옛 데이터를 비우고 최신 샘플로 다시 채움
+  final wantReset = q['reset'] == '1' || q['seed'] == 'reset';
+  if (wantReset) {
+    for (final sub in s.submissions.toList()) {
+      s.deleteSubmission(sub.id);
+    }
+    s.seedDemo();
+  } else if (q['seed'] == '1' && s.submissions.isEmpty) {
+    s.seedDemo();
+  }
   switch (q['role']) {
     case 'admin':
       s.setRole(Role.admin);
