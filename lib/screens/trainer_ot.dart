@@ -128,10 +128,7 @@ class _TrainerOtPageState extends State<TrainerOtPage> {
             _pair('근육량', 'm_now', '목표', 'm_goal'),
             _pair('기초대사량', 'b_now', '목표', 'b_goal'),
           ]),
-          FormSection(title: '② 근력 평가', children: [
-            for (var i = 1; i <= 3; i++) ..._strength(i),
-          ]),
-          FormSection(title: '③ 자세 · 분석 · 컨설팅', children: [
+          FormSection(title: '② 자세 · 분석 · 컨설팅', children: [
             TextField2(data, 'checkpoint', '정적자세 Check point',
                 maxLines: 2, onChanged: _c),
             TextField2(data, 'analysis', '평가분석 내용', maxLines: 3, onChanged: _c),
@@ -139,7 +136,7 @@ class _TrainerOtPageState extends State<TrainerOtPage> {
             ChipsField(data, 'period', '최종 기간 컨설팅', periodOptions,
                 multi: false, onChanged: _c),
           ]),
-          FormSection(title: '④ 오티 프로그램 목표', children: [
+          FormSection(title: '③ 오티 프로그램 목표', children: [
             DropdownField(data, 'your_goal', '운동목적 (= 프로그램명)', goalOptions,
                 onChanged: _c),
             TextField2(data, 'set_per_day', '총 1일 세트',
@@ -151,7 +148,7 @@ class _TrainerOtPageState extends State<TrainerOtPage> {
             TextField2(data, 'target_hr', '목표 심박수', onChanged: _c),
           ]),
           for (var i = 1; i <= 3; i++) _sessionSection(i),
-          FormSection(title: '⑥ 특이사항 메모', children: [
+          FormSection(title: '⑤ 특이사항 메모', children: [
             TextField2(data, 'trainer_note',
                 '통증·부상·주의사항 등 트레이너 메모', maxLines: 3, onChanged: _c),
           ]),
@@ -232,33 +229,11 @@ class _TrainerOtPageState extends State<TrainerOtPage> {
         ],
       );
 
-  List<Widget> _strength(int i) {
-    final p = 's$i';
-    return [
-      DropdownField(data, '${p}_name', '$i) 운동명', exerciseOptions, onChanged: _c),
-      Row(children: [
-        Expanded(
-            child: TextField2(data, '${p}_w1', '무게1',
-                keyboardType: TextInputType.number, onChanged: _c)),
-        const SizedBox(width: 6),
-        Expanded(
-            child: TextField2(data, '${p}_w2', '무게2',
-                keyboardType: TextInputType.number, onChanged: _c)),
-        const SizedBox(width: 6),
-        Expanded(
-            child: TextField2(data, '${p}_rep', '횟수',
-                keyboardType: TextInputType.number, onChanged: _c)),
-      ]),
-      ChipsField(data, '${p}_lv', '강도', levelOptions, multi: false, onChanged: _c),
-      const Divider(),
-    ];
-  }
-
   Widget _sessionSection(int i) {
     final p = 'os$i';
     final signedM = (data['${p}_msign'] ?? '').toString().isNotEmpty;
     final signedA = (data['${p}_asign'] ?? '').toString().isNotEmpty;
-    return FormSection(title: '⑤-$i  $i회차 오티', children: [
+    return FormSection(title: '④-$i  $i회차 오티', children: [
       Row(children: [
         Expanded(child: DateField(data, '${p}_date', '날짜', onChanged: _c)),
         const SizedBox(width: 6),

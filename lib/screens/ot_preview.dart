@@ -339,7 +339,6 @@ class OtFormPreview extends StatelessWidget {
   // 1페이지 STEP2: 평가분석 (인체 이미지 포함)
   // ------------------------------------------------------------------
   Widget _evalSheet() {
-    final gender = _s('gender');
     return Container(
       decoration: _paper,
       padding: const EdgeInsets.all(12),
@@ -354,13 +353,6 @@ class OtFormPreview extends StatelessWidget {
           _inbody('체지방량', 'f_now', 'f_goal', 'kg'),
           _inbody('근육량', 'm_now', 'm_goal', 'kg'),
           _inbody('기초대사량', 'b_now', 'b_goal', 'kcal'),
-          const SizedBox(height: 8),
-          Row(children: [
-            const Text('< 근력평가 >  ', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12.5)),
-            _chk(gender == '남', '남'),
-            _chk(gender == '여', '여'),
-          ]),
-          for (var i = 1; i <= 3; i++) _strengthRow(i),
           const SizedBox(height: 10),
           const Text('< 정적자세 평가 >', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12.5)),
           const SizedBox(height: 4),
@@ -397,25 +389,6 @@ class OtFormPreview extends StatelessWidget {
           Text(' $unit', style: const TextStyle(fontSize: 11.5)),
         ]),
       );
-
-  Widget _strengthRow(int i) {
-    final p = 's$i';
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Row(children: [
-        const Text('-( ', style: TextStyle(fontSize: 11.5)),
-        _v('${p}_name', min: 50),
-        const Text(' ) ', style: TextStyle(fontSize: 11.5)),
-        _v('${p}_w1', min: 24),
-        const Text(' / ', style: TextStyle(fontSize: 11.5)),
-        _v('${p}_w2', min: 24),
-        const Text(' x ', style: TextStyle(fontSize: 11.5)),
-        _v('${p}_rep', min: 22),
-        const Text(' rep  ', style: TextStyle(fontSize: 11.5)),
-        ...['상', '중', '하'].map((o) => _chk(_s('${p}_lv') == o, o)),
-      ]),
-    );
-  }
 
   Widget _memo(String k, String label) {
     final t = _s(k);
