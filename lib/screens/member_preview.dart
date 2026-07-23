@@ -106,13 +106,18 @@ class MemberFormView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   typeRow,
+                  // 이름 · 연락처
                   Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Expanded(flex: 3, child: _text('이름', 'name')),
                     const SizedBox(width: 8),
-                    Expanded(flex: 2, child: _text('나이', 'age')),
+                    Expanded(flex: 4, child: _text('연락처', 'phone', fit: true)),
                   ]),
-                  _text('연락처', 'phone', fit: true),
-                  _chips('성별', 'gender', genders, multi: false),
+                  // 성별 · 나이
+                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Expanded(child: _chips('성별', 'gender', genders, multi: false)),
+                    const SizedBox(width: 8),
+                    Expanded(child: _text('나이', 'age')),
+                  ]),
                   jobRow,
                 ]);
           }
