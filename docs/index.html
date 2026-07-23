@@ -29,8 +29,24 @@
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
-  <title>hbgym_ot</title>
+  <title>헬스보이짐 분당정자점</title>
   <link rel="manifest" href="manifest.json">
+
+  <!-- 즉시 반영: 예전에 등록된 서비스워커/캐시를 제거해 항상 최신 화면이 뜨게 함 -->
+  <script>
+    (function () {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations()
+          .then(function (rs) { rs.forEach(function (r) { r.unregister(); }); })
+          .catch(function () {});
+      }
+      if (window.caches && caches.keys) {
+        caches.keys().then(function (keys) {
+          keys.forEach(function (k) { caches.delete(k); });
+        }).catch(function () {});
+      }
+    })();
+  </script>
 </head>
 <body>
   <!--
