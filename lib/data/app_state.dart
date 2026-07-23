@@ -166,7 +166,7 @@ class AppState extends ChangeNotifier {
     final s3 = createSubmission({
       ...base,
       'name': '최완료',
-      'member_type': '체험',
+      'member_type': '리뉴',
       'jongmok': '헬스',
       'your_goal': '체지방 감소'
     });
@@ -197,10 +197,10 @@ class AppState extends ChangeNotifier {
     });
     // 실패 예시 (정트레이너가 실패로 완료)
     final s5 = createSubmission(
-        {...base, 'name': '한실패', 'member_type': '체험', 'jongmok': '헬스'});
+        {...base, 'name': '한실패', 'member_type': '신규', 'jongmok': '헬스'});
     assignTrainer(s5.id, '정트레이너');
     completeSubmission(s5.id, {
-      'analysis': '체험 종료 후 미등록',
+      'analysis': '상담 종료 후 미등록',
       'os1_date': '2026-07-22', 'os1_time': '18:00', 'os1_prog': '전신 순환 운동',
     });
     setOutcome(s5.id, SubStatus.failure);
