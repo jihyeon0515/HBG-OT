@@ -12,23 +12,43 @@ class MemberFormView extends StatelessWidget {
   Set<String> _selOf(String k) =>
       data[k] is List ? (data[k] as List).map((e) => e.toString()).toSet() : {};
 
-  Widget _text(String label, String field, {int maxLines = 1}) => Padding(
-        padding: const EdgeInsets.only(bottom: 10),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          fieldLabel(label),
-          Container(
-            width: double.infinity,
-            constraints: BoxConstraints(minHeight: maxLines > 1 ? 58 : 0),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-            decoration: BoxDecoration(
-                color: const Color(0xFFFAFAF8),
-                border: Border.all(color: kBorder),
-                borderRadius: BorderRadius.circular(9)),
-            child: Text(_s(field).isEmpty ? '-' : _s(field),
-                style: const TextStyle(fontSize: 13.5, color: kInk)),
-          ),
-        ]),
+  Widget _text(String label, String field, {int maxLines = 1, bool fit = false}) {
+    final value = _s(field).isEmpty ? '-' : _s(field);
+    Widget valueText = Text(value,
+        maxLines: maxLines,
+        overflow: TextOverflow.clip,
+        style: const TextStyle(fontSize: 13.5, color: kInk));
+    // fit=true: 좁은 칸에서도 한 줄에 들어가도록 폭에 맞춰 자동 축소
+    if (fit) {
+      valueText = Align(
+        alignment: Alignment.centerLeft,
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.centerLeft,
+          child: Text(value,
+              maxLines: 1,
+              softWrap: false,
+              style: const TextStyle(fontSize: 13.5, color: kInk)),
+        ),
       );
+    }
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        fieldLabel(label),
+        Container(
+          width: double.infinity,
+          constraints: BoxConstraints(minHeight: maxLines > 1 ? 58 : 0),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          decoration: BoxDecoration(
+              color: const Color(0xFFFAFAF8),
+              border: Border.all(color: kBorder),
+              borderRadius: BorderRadius.circular(9)),
+          child: valueText,
+        ),
+      ]),
+    );
+  }
 
   Widget _chips(String label, String field, List<String> options,
       {bool multi = true}) {
@@ -72,7 +92,7 @@ class MemberFormView extends StatelessWidget {
         Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Expanded(flex: 3, child: _text('이름', 'name')),
           const SizedBox(width: 8),
-          Expanded(flex: 4, child: _text('연락처', 'phone')),
+          Expanded(flex: 4, child: _text('연락처', 'phone', fit: true)),
           const SizedBox(width: 8),
           Expanded(flex: 2, child: _chips('성별', 'gender', genders, multi: false)),
           const SizedBox(width: 8),
