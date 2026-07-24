@@ -155,7 +155,8 @@ class _TrainerOtPageState extends State<TrainerOtPage> {
         padding: const EdgeInsets.all(14),
         children: [
           _memberSummary(),
-          // 관리자 메모 (트레이너는 읽기 전용)
+          // 직원 MEMO(노랑) → 관리자 MEMO(파랑) — 모두 읽기 전용
+          StaffMemoView(data: data),
           SpecialNoteBox(data: data, editable: false),
           const SizedBox(height: 12),
           _trainerHeader(),

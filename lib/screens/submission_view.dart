@@ -91,21 +91,24 @@ class _SpecialNoteBoxState extends State<SpecialNoteBox> {
   @override
   Widget build(BuildContext context) {
     final admin = (widget.data['admin_note'] ?? '').toString().trim();
+    const blue = Color(0xFF2F80ED);
     return Container(
       margin: const EdgeInsets.only(top: 12),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: kYellow.withValues(alpha: 0.18),
+        color: blue.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: kYellowDark),
+        border: Border.all(color: blue, width: 1.3),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         const Row(children: [
-          Icon(Icons.push_pin, size: 17, color: kBlack),
+          Icon(Icons.push_pin, size: 17, color: blue),
           SizedBox(width: 6),
           Text('관리자 MEMO',
               style: TextStyle(
-                  fontWeight: FontWeight.w900, fontSize: 15, color: kBlack)),
+                  fontWeight: FontWeight.w900,
+                  fontSize: 15,
+                  color: Color(0xFF1B5AAE))),
         ]),
         const SizedBox(height: 8),
         if (widget.editable)
@@ -121,7 +124,7 @@ class _SpecialNoteBoxState extends State<SpecialNoteBox> {
               isDense: true,
               border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(9),
-                  borderSide: const BorderSide(color: kYellowDark)),
+                  borderSide: const BorderSide(color: blue)),
               enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(9),
                   borderSide: const BorderSide(color: kBorder)),
@@ -131,6 +134,37 @@ class _SpecialNoteBoxState extends State<SpecialNoteBox> {
         else
           Text(admin.isEmpty ? '-' : admin,
               style: const TextStyle(fontSize: 13.5, color: kInk)),
+      ]),
+    );
+  }
+}
+
+/// 직원 MEMO (읽기 전용, 노란색) — 회원 접수 시 직원이 작성
+class StaffMemoView extends StatelessWidget {
+  final Map data;
+  const StaffMemoView({super.key, required this.data});
+  @override
+  Widget build(BuildContext context) {
+    final t = (data['staff_memo'] ?? '').toString().trim();
+    return Container(
+      margin: const EdgeInsets.only(top: 12),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: kYellow.withValues(alpha: 0.20),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: kYellowDark, width: 1.3),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const Row(children: [
+          Icon(Icons.badge, size: 17, color: kBlack),
+          SizedBox(width: 6),
+          Text('직원 MEMO',
+              style: TextStyle(
+                  fontWeight: FontWeight.w900, fontSize: 15, color: kBlack)),
+        ]),
+        const SizedBox(height: 8),
+        Text(t.isEmpty ? '-' : t,
+            style: const TextStyle(fontSize: 13.5, color: kInk)),
       ]),
     );
   }
@@ -232,9 +266,9 @@ class SubmissionView extends StatelessWidget {
         // 회원 작성 내용 — 수정 불가한 종이 양식(이미지)로 화면 폭에 맞춰 표시
         _sectionTitle(Icons.assignment_ind, '회원 작성 내용'),
         MemberFormPreview(data: d, memberName: sub.memberName),
-        // 직원 MEMO (읽기 전용) → 관리자 MEMO (편집 가능)
+        // 직원 MEMO(노랑, 읽기 전용) → 관리자 MEMO(파랑, 편집 가능)
         if (editableNote) ...[
-          _staffMemoBox(d),
+          StaffMemoView(data: d),
           SpecialNoteBox(
               data: d, editable: true, onChanged: onNoteChanged),
         ],
@@ -271,35 +305,6 @@ class SubmissionView extends StatelessWidget {
           ),
         ],
       ],
-    );
-  }
-
-  /// 직원 MEMO (회원 접수 시 직원이 작성) — 관리자 페이지에서 읽기 전용 표시
-  Widget _staffMemoBox(Map d) {
-    final t = (d['staff_memo'] ?? '').toString().trim();
-    const blue = Color(0xFF2F80ED);
-    return Container(
-      margin: const EdgeInsets.only(top: 12),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: blue.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: blue, width: 1.3),
-      ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Row(children: [
-          Icon(Icons.badge, size: 17, color: blue),
-          SizedBox(width: 6),
-          Text('직원 MEMO',
-              style: TextStyle(
-                  fontWeight: FontWeight.w900,
-                  fontSize: 15,
-                  color: Color(0xFF1B5AAE))),
-        ]),
-        const SizedBox(height: 8),
-        Text(t.isEmpty ? '-' : t,
-            style: const TextStyle(fontSize: 13.5, color: kInk)),
-      ]),
     );
   }
 
