@@ -94,7 +94,6 @@ class OtFormPreview extends StatelessWidget {
       this.trainerName = ''});
 
   String _s(String k) => (data[k] ?? '').toString();
-  bool _has(String k) => _s(k).trim().isNotEmpty;
 
   @override
   Widget build(BuildContext context) => _sheet();
@@ -243,12 +242,13 @@ class OtFormPreview extends StatelessWidget {
         ]),
         const SizedBox(height: 5),
         _multiline('${p}_prog', '운동 프로그램'),
-        if (_has('${p}_tip'))
-          Padding(
-            padding: const EdgeInsets.only(top: 3),
-            child: Text('- tip: ${_s('${p}_tip')}',
-                style: const TextStyle(fontSize: 11.5, color: _blue)),
-          ),
+        const SizedBox(height: 3),
+        // 회차별 메모란
+        Row(children: const [
+          Text('메모', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
+        ]),
+        const SizedBox(height: 2),
+        _multiline('${p}_tip', '메모'),
         const SizedBox(height: 4),
         Row(children: [
           const Text('다음오티 ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
