@@ -64,11 +64,15 @@ class RootShell extends StatelessWidget {
     final app = context.watch<AppState>();
     return Scaffold(
       appBar: AppBar(
+        titleSpacing: 12,
         title: Row(mainAxisSize: MainAxisSize.min, children: [
-          Image.asset('assets/logo_white.png', height: 26),
-          const SizedBox(width: 10),
-          const Text('헬스보이짐 분당정자점',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
+          Image.asset('assets/logo_full.png', height: 40),
+          const SizedBox(width: 12),
+          const Flexible(
+            child: Text('헬스보이짐 분당정자점',
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
+          ),
         ]),
         actions: [
           if (app.role == Role.trainer) _trainerPicker(context, app),
