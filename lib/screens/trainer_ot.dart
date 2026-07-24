@@ -128,27 +128,8 @@ class _TrainerOtPageState extends State<TrainerOtPage> {
             _pair('근육량', 'm_now', '목표', 'm_goal'),
             _pair('기초대사량', 'b_now', '목표', 'b_goal'),
           ]),
-          FormSection(title: '② 자세 · 분석 · 컨설팅', children: [
-            TextField2(data, 'checkpoint', '정적자세 Check point',
-                maxLines: 2, onChanged: _c),
-            TextField2(data, 'analysis', '평가분석 내용', maxLines: 3, onChanged: _c),
-            TextField2(data, 'program', '권장 운동프로그램', maxLines: 3, onChanged: _c),
-            ChipsField(data, 'period', '최종 기간 컨설팅', periodOptions,
-                multi: false, onChanged: _c),
-          ]),
-          FormSection(title: '③ 오티 프로그램 목표', children: [
-            DropdownField(data, 'your_goal', '운동목적 (= 프로그램명)', goalOptions,
-                onChanged: _c),
-            TextField2(data, 'set_per_day', '총 1일 세트',
-                keyboardType: TextInputType.number, onChanged: _c),
-            DropdownField(data, 'rec_days', '권장 운동일 (주 __회)', daysOptions,
-                onChanged: _c),
-            DropdownField(data, 'time_min', '운동 시간(분)', exTimeOptions,
-                onChanged: _c),
-            TextField2(data, 'target_hr', '목표 심박수', onChanged: _c),
-          ]),
           for (var i = 1; i <= 3; i++) _sessionSection(i),
-          FormSection(title: '⑤ 특이사항 메모', children: [
+          FormSection(title: '③ 특이사항 메모', children: [
             TextField2(data, 'trainer_note',
                 '통증·부상·주의사항 등 트레이너 메모', maxLines: 3, onChanged: _c),
           ]),
@@ -236,7 +217,7 @@ class _TrainerOtPageState extends State<TrainerOtPage> {
     final p = 'os$i';
     final signedM = (data['${p}_msign'] ?? '').toString().isNotEmpty;
     final signedA = (data['${p}_asign'] ?? '').toString().isNotEmpty;
-    return FormSection(title: '④-$i  $i회차 오티', children: [
+    return FormSection(title: '②-$i  $i회차 오티', children: [
       Row(children: [
         Expanded(child: DateField(data, '${p}_date', '날짜', onChanged: _c)),
         const SizedBox(width: 6),
