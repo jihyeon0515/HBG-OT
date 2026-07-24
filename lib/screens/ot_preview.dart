@@ -119,23 +119,6 @@ class OtFormPreview extends StatelessWidget {
     );
   }
 
-  Widget _chk(bool on, String label) => Padding(
-        padding: const EdgeInsets.only(right: 10, bottom: 2),
-        child: Row(mainAxisSize: MainAxisSize.min, children: [
-          Text(on ? '☑' : '☐',
-              style: TextStyle(
-                  fontSize: 13,
-                  color: on ? _blue : Colors.black54,
-                  fontWeight: FontWeight.w700)),
-          const SizedBox(width: 2),
-          Text(label,
-              style: TextStyle(
-                  fontSize: 11.5,
-                  color: on ? _blue : Colors.black87,
-                  fontWeight: on ? FontWeight.w700 : FontWeight.w400)),
-        ]),
-      );
-
   BoxDecoration get _paper => BoxDecoration(
         color: Colors.white,
         border: Border.all(color: _line, width: 1.4),
@@ -153,50 +136,68 @@ class OtFormPreview extends StatelessWidget {
   // ------------------------------------------------------------------
   // 오티 문진표 (트레이너 입력 내용 그대로 반영)
   // ------------------------------------------------------------------
+  Widget _cellVal(String text) => Expanded(
+        child: Padding(
+          padding: const EdgeInsets.all(5),
+          child: Text(text.isEmpty ? '-' : text,
+              style: const TextStyle(
+                  fontSize: 12, color: _blue, fontWeight: FontWeight.w700)),
+        ),
+      );
+
   Widget _sheet() {
-    final gender = _s('gender');
+    final vline = Container(width: 1, color: _line);
     return Container(
       decoration: _paper,
       padding: const EdgeInsets.all(12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 헤더: 로고 + 타이틀
+          // 헤더: 로고 + 타이틀 (트레이너 OT 기록지와 동일)
           Row(children: [
             Image.asset('assets/logo.png', height: 40),
             const SizedBox(width: 10),
             const Expanded(
-              child: Text('ORIENTATION PROGRAM',
-                  style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w900,
-                      color: Color(0xFF1330B8))),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text('OT 기록지',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+                Text('ORIENTATION  RECORD',
+                    style: TextStyle(
+                        fontSize: 9.5,
+                        letterSpacing: 2.5,
+                        color: Colors.black45,
+                        fontWeight: FontWeight.w700)),
+              ]),
             ),
           ]),
           Container(height: 6, color: _line, margin: const EdgeInsets.symmetric(vertical: 8)),
-          // 회원 정보 표 (이름 · 성별 · 담당T)
+          // 회원 · 담당T · 회원권 정보 표
           Container(
             decoration: BoxDecoration(border: Border.all(color: _line)),
             child: Column(children: [
               IntrinsicHeight(
                 child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                  SizedBox(width: 62, child: _labelCell('회원이름')),
-                  Expanded(child: Padding(padding: const EdgeInsets.all(5), child: Text(memberName, style: const TextStyle(fontSize: 12, color: _blue, fontWeight: FontWeight.w700)))),
-                  Container(width: 1, color: _line),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                    child: Row(mainAxisSize: MainAxisSize.min, children: [
-                      _chk(gender == '남', '남'),
-                      _chk(gender == '여', '여'),
-                    ]),
-                  ),
+                  SizedBox(width: 62, child: _labelCell('회원명')),
+                  vline,
+                  _cellVal(memberName),
+                  vline,
+                  SizedBox(width: 52, child: _labelCell('담당T')),
+                  vline,
+                  _cellVal(trainerName),
                 ]),
               ),
               Container(height: 1, color: _line),
-              Row(children: [
-                SizedBox(width: 62, child: _labelCell('담당T')),
-                Expanded(child: Padding(padding: const EdgeInsets.all(5), child: Text(trainerName, style: const TextStyle(fontSize: 12, color: _blue, fontWeight: FontWeight.w700)))),
-              ]),
+              IntrinsicHeight(
+                child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                  SizedBox(width: 84, child: _labelCell('회원권 시작일')),
+                  vline,
+                  _cellVal(_s('mem_start')),
+                  vline,
+                  SizedBox(width: 84, child: _labelCell('회원권 만료일')),
+                  vline,
+                  _cellVal(_s('mem_end')),
+                ]),
+              ),
             ]),
           ),
           const SizedBox(height: 10),
