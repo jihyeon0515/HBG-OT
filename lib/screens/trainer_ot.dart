@@ -5,10 +5,14 @@ import '../data/app_state.dart';
 import '../models/options.dart';
 import '../models/submission.dart';
 import '../theme.dart';
-import '../widgets/form_fields.dart';
 import 'member_preview.dart';
 import 'ot_preview.dart';
 import 'submission_view.dart';
+
+// 종이 양식 색
+const _pBlue = Color(0xFF0B3F8F);
+const _pLine = Color(0xFF222222);
+const _pHdr = Color(0xFFFFF3C4);
 
 /// 트레이너가 OT 평가 · 프로그램을 작성하는 화면
 class TrainerOtPage extends StatefulWidget {
@@ -147,18 +151,12 @@ class _TrainerOtPageState extends State<TrainerOtPage> {
         padding: const EdgeInsets.all(14),
         children: [
           _memberSummary(),
+          // 관리자 메모 (트레이너는 읽기 전용)
+          SpecialNoteBox(data: data, editable: false),
+          const SizedBox(height: 12),
           _trainerHeader(),
-          FormSection(title: '① InBody 분석', children: [
-            _pair('체중', 'w_now', '목표', 'w_goal'),
-            _pair('체지방량', 'f_now', '목표', 'f_goal'),
-            _pair('근육량', 'm_now', '목표', 'm_goal'),
-            _pair('기초대사량', 'b_now', '목표', 'b_goal'),
-          ]),
-          for (var i = 1; i <= 3; i++) _sessionSection(i),
-          FormSection(title: '③ 특이사항 메모', children: [
-            TextField2(data, 'trainer_note', '트레이너 메모',
-                maxLines: 3, onChanged: _c),
-          ]),
+          // 트레이너 작성 — 종이 양식(이미지) 인터랙티브 폼
+          _trainerPaper(),
           // ---- 오티문진표 미리보기 (입력값 실시간 반영) ----
           const SizedBox(height: 6),
           Row(children: [
@@ -227,69 +225,226 @@ class _TrainerOtPageState extends State<TrainerOtPage> {
     );
   }
 
-  Widget _pair(String la, String ka, String lb, String kb) => Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Expanded(
-              child: TextField2(data, ka, la,
-                  keyboardType: TextInputType.number, onChanged: _c)),
-          const Padding(
-            padding: EdgeInsets.only(bottom: 18, left: 4, right: 4),
-            child: Text('→'),
+  // ---------------------------------------------------------------
+  // 종이 양식(이미지) 인터랙티브 요소
+  // ---------------------------------------------------------------
+  Widget _psection(String title, List<Widget> rows) => Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        decoration: BoxDecoration(border: Border.all(color: _pLine, width: 1.2)),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          Container(
+            color: _pHdr,
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+            child: Text(title,
+                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12.5)),
           ),
-          Expanded(
-              child: TextField2(data, kb, lb,
-                  keyboardType: TextInputType.number, onChanged: _c)),
-        ],
+          Padding(
+            padding: const EdgeInsets.all(9),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start, children: rows),
+          ),
+        ]),
       );
 
-  Widget _sessionSection(int i) {
+  Widget _plabel(String t) => Padding(
+        padding: const EdgeInsets.only(top: 2, bottom: 4),
+        child: Text(t,
+            style: const TextStyle(
+                fontSize: 11.5, fontWeight: FontWeight.w800, color: Colors.black87)),
+      );
+
+  Widget _pkv(String label, Widget value, {double labelW = 78}) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+          SizedBox(
+              width: labelW,
+              child: Text(label,
+                  style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700))),
+          Expanded(child: value),
+        ]),
+      );
+
+  /// 밑줄형 직접 입력칸
+  Widget _ptext(String field,
+          {String hint = '', int maxLines = 1, TextInputType? kb}) =>
+      TextFormField(
+        initialValue: (data[field] ?? '').toString(),
+        maxLines: maxLines,
+        keyboardType: kb,
+        style: const TextStyle(
+            fontSize: 12.5, color: _pBlue, fontWeight: FontWeight.w700),
+        decoration: InputDecoration(
+          isDense: true,
+          hintText: hint,
+          hintStyle:
+              const TextStyle(color: Colors.black38, fontWeight: FontWeight.w400),
+          contentPadding: const EdgeInsets.symmetric(vertical: 4),
+          enabledBorder: const UnderlineInputBorder(
+              borderSide: BorderSide(color: Color(0xFFBBBBBB))),
+          focusedBorder:
+              const UnderlineInputBorder(borderSide: BorderSide(color: _pBlue)),
+        ),
+        onChanged: (v) => data[field] = v,
+      );
+
+  /// 탭하면 달력에서 날짜 선택
+  Widget _pdate(String field, {String hint = '날짜 선택'}) {
+    final cur = (data[field] ?? '').toString();
+    return InkWell(
+      onTap: () async {
+        final now = DateTime.now();
+        final picked = await showDatePicker(
+          context: context,
+          initialDate: DateTime.tryParse(cur) ?? now,
+          firstDate: DateTime(now.year - 2),
+          lastDate: DateTime(now.year + 3),
+        );
+        if (picked != null) {
+          data[field] =
+              '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
+          _c();
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 5),
+        decoration: const BoxDecoration(
+            border: Border(bottom: BorderSide(color: Color(0xFFBBBBBB)))),
+        child: Row(children: [
+          Expanded(
+            child: Text(cur.isEmpty ? hint : cur,
+                style: TextStyle(
+                    fontSize: 12.5,
+                    color: cur.isEmpty ? Colors.black38 : _pBlue,
+                    fontWeight: FontWeight.w700)),
+          ),
+          const Icon(Icons.calendar_today, size: 15, color: Colors.black45),
+        ]),
+      ),
+    );
+  }
+
+  /// 드롭다운에서 시간 선택
+  Widget _ptime(String field, {String hint = '시간'}) {
+    final cur = (data[field] ?? '').toString();
+    return Container(
+      padding: const EdgeInsets.only(bottom: 2),
+      decoration: const BoxDecoration(
+          border: Border(bottom: BorderSide(color: Color(0xFFBBBBBB)))),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          key: ValueKey('$field-$cur'),
+          value: timeOptions.contains(cur) ? cur : null,
+          isDense: true,
+          isExpanded: true,
+          hint: Text(hint,
+              style: const TextStyle(fontSize: 12.5, color: Colors.black38)),
+          style: const TextStyle(
+              fontSize: 12.5, color: _pBlue, fontWeight: FontWeight.w700),
+          items: timeOptions
+              .map((o) => DropdownMenuItem(value: o, child: Text(o)))
+              .toList(),
+          onChanged: (v) {
+            data[field] = v;
+            _c();
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _pInbody(String label, String ka, String kb) => _pkv(
+        label,
+        Row(children: [
+          Expanded(child: _ptext(ka, kb: TextInputType.number)),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 6),
+            child: Text('→ 목표', style: TextStyle(fontSize: 11)),
+          ),
+          Expanded(child: _ptext(kb, kb: TextInputType.number)),
+        ]),
+        labelW: 66,
+      );
+
+  /// 트레이너 작성 종이 양식(이미지) — 각 칸을 탭하여 입력/선택
+  Widget _trainerPaper() {
+    return Container(
+      decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: _pLine, width: 1.4),
+          borderRadius: BorderRadius.circular(6)),
+      padding: const EdgeInsets.all(12),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Image.asset('assets/logo.png', height: 26),
+          const SizedBox(width: 8),
+          const Text('OT 기록',
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900)),
+        ]),
+        Container(
+            height: 4,
+            color: _pLine,
+            margin: const EdgeInsets.symmetric(vertical: 8)),
+        _psection('InBody 분석', [
+          _pInbody('체중', 'w_now', 'w_goal'),
+          _pInbody('체지방량', 'f_now', 'f_goal'),
+          _pInbody('근육량', 'm_now', 'm_goal'),
+          _pInbody('기초대사량', 'b_now', 'b_goal'),
+        ]),
+        for (var i = 1; i <= 3; i++) _paperSession(i),
+        _psection('트레이너 메모', [
+          _ptext('trainer_note', hint: '트레이너 메모', maxLines: 3),
+        ]),
+      ]),
+    );
+  }
+
+  Widget _paperSession(int i) {
     final p = 'os$i';
     // 다음 오티 일정 = 다음 회차(i+1)의 날짜/시간과 같은 값 → 입력하면 다음 회차에 자동 반영
     final nextDateKey = i < 3 ? 'os${i + 1}_date' : 'os3_ndate';
     final nextTimeKey = i < 3 ? 'os${i + 1}_time' : 'os3_ntime';
-    return FormSection(title: '②-$i  $i회차 오티', children: [
-      Row(children: [
-        Expanded(child: DateField(data, '${p}_date', '날짜', onChanged: _c)),
-        const SizedBox(width: 6),
-        Expanded(
-            child: DropdownField(data, '${p}_time', '시간', timeOptions,
-                onChanged: _c)),
+    return _psection('$i회차 오티', [
+      Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+        Expanded(child: _pkv('날짜', _pdate('${p}_date'), labelW: 40)),
+        const SizedBox(width: 10),
+        Expanded(child: _pkv('시간', _ptime('${p}_time'), labelW: 40)),
       ]),
-      TextField2(data, '${p}_prog', '운동 프로그램 내용', maxLines: 3, onChanged: _c),
-      TextField2(data, '${p}_tip', '메모', maxLines: 2, onChanged: _c),
-      // 다음 오티 일정 (날짜 + 시간 드롭다운)
+      const SizedBox(height: 4),
+      _plabel('운동 프로그램 내용'),
+      _ptext('${p}_prog', hint: '운동 프로그램 내용', maxLines: 3),
+      const SizedBox(height: 8),
+      _plabel('메모'),
+      _ptext('${p}_tip', hint: '메모', maxLines: 2),
+      const SizedBox(height: 10),
+      // 다음 오티 일정
       Container(
-        margin: const EdgeInsets.only(top: 4, bottom: 6),
-        padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
+        padding: const EdgeInsets.fromLTRB(9, 7, 9, 9),
         decoration: BoxDecoration(
           color: const Color(0xFFFFF9E3),
-          borderRadius: BorderRadius.circular(10),
           border: Border.all(color: kYellowDark),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            const Icon(Icons.event_repeat, size: 16, color: kBlack),
+            const Icon(Icons.event_repeat, size: 15, color: kBlack),
             const SizedBox(width: 5),
-            Text(
-                i < 3
-                    ? '다음 오티 일정  (입력 시 ${i + 1}회차 날짜·시간에 자동 입력)'
-                    : '다음 오티 일정',
-                style: const TextStyle(
-                    fontSize: 12, fontWeight: FontWeight.w800, color: kBlack)),
+            Flexible(
+              child: Text(
+                  i < 3
+                      ? '다음 오티 일정 (입력 시 ${i + 1}회차에 자동 입력)'
+                      : '다음 오티 일정',
+                  style: const TextStyle(
+                      fontSize: 11.5, fontWeight: FontWeight.w800, color: kBlack)),
+            ),
           ]),
           const SizedBox(height: 6),
           Row(children: [
-            Expanded(
-                child: DateField(data, nextDateKey, '날짜', onChanged: _c)),
-            const SizedBox(width: 6),
-            Expanded(
-                child: DropdownField(data, nextTimeKey, '시간', timeOptions,
-                    onChanged: _c)),
+            Expanded(child: _pdate(nextDateKey)),
+            const SizedBox(width: 10),
+            Expanded(child: _ptime(nextTimeKey)),
           ]),
         ]),
       ),
-      const SizedBox(height: 4),
+      const SizedBox(height: 10),
       Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Expanded(child: _signBox('회원 서명', memberName, '${p}_msign', '${p}_mfont')),
         const SizedBox(width: 10),
