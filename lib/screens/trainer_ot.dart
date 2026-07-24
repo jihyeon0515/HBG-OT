@@ -395,20 +395,44 @@ class _TrainerOtPageState extends State<TrainerOtPage> {
             height: 5,
             color: _pLine,
             margin: const EdgeInsets.symmetric(vertical: 9)),
-        // 회원 · 담당 트레이너 정보 표
+        // 회원 · 담당 트레이너 · 회원권 정보 표
         Container(
           decoration: BoxDecoration(border: Border.all(color: _pLine)),
-          child: IntrinsicHeight(
-            child: Row(children: [
-              _labelCell('회원명', 64),
-              vline,
-              _valCell(memberName),
-              vline,
-              _labelCell('담당T', 52),
-              vline,
-              _valCell(trainer),
-            ]),
-          ),
+          child: Column(children: [
+            IntrinsicHeight(
+              child: Row(children: [
+                _labelCell('회원명', 64),
+                vline,
+                _valCell(memberName),
+                vline,
+                _labelCell('담당T', 52),
+                vline,
+                _valCell(trainer),
+              ]),
+            ),
+            Container(height: 1, color: _pLine),
+            IntrinsicHeight(
+              child: Row(children: [
+                _labelCell('회원권 시작일', 88),
+                vline,
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                    child: _pdate('mem_start', hint: '시작일 선택'),
+                  ),
+                ),
+                vline,
+                _labelCell('회원권 만료일', 88),
+                vline,
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                    child: _pdate('mem_end', hint: '만료일 선택'),
+                  ),
+                ),
+              ]),
+            ),
+          ]),
         ),
         const SizedBox(height: 12),
         _psection('InBody 분석', [
