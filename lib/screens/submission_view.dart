@@ -227,9 +227,9 @@ class SubmissionView extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       children: [
         _statusHeader(),
-        // 회원 작성 내용 — 폼 그대로 바로 표시 (클릭 없이)
+        // 회원 작성 내용 — 수정 불가한 종이 양식(이미지)로 화면 폭에 맞춰 표시
         _sectionTitle(Icons.assignment_ind, '회원 작성 내용'),
-        MemberFormView(data: d),
+        MemberFormPreview(data: d, memberName: sub.memberName),
         // 특이사항 (관리자 편집 가능)
         if (editableNote)
           SpecialNoteBox(

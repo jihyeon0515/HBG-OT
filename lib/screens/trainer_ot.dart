@@ -75,7 +75,8 @@ class _TrainerOtPageState extends State<TrainerOtPage> {
         const Text('회원이 작성한 내역입니다. 트레이너는 수정할 수 없습니다.',
             style: TextStyle(fontSize: 11.5, color: kMuted)),
         const SizedBox(height: 10),
-        MemberFormView(data: data),
+        // 수정 불가한 종이 양식(이미지) — 화면 폭에 맞춰 표시
+        MemberFormPreview(data: data, memberName: memberName),
       ]),
     );
   }
@@ -173,17 +174,8 @@ class _TrainerOtPageState extends State<TrainerOtPage> {
           const Text('입력하신 내용이 실시간 반영됩니다. 미리보기를 누르면 전체 화면으로 볼 수 있습니다.',
               style: TextStyle(fontSize: 12, color: kMuted)),
           const SizedBox(height: 12),
-          // ① 회원 작성 내용 (이미지)
-          const Text('① 회원 작성 내용',
-              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5, color: kInk)),
-          const SizedBox(height: 6),
-          PreviewThumbnail(
-            title: '$memberName · 회원 작성 내용',
-            builder: () => MemberFormPreview(data: data, memberName: memberName),
-          ),
-          const SizedBox(height: 16),
-          // ② OT 회차별 기록 (회차별 메모 포함)
-          const Text('② OT 회차별 기록',
+          // OT 회차별 기록 미리보기 (회원 작성 내용은 상단에 이미지로 표시됨)
+          const Text('OT 회차별 기록 미리보기',
               style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5, color: kInk)),
           const SizedBox(height: 6),
           PreviewThumbnail(
