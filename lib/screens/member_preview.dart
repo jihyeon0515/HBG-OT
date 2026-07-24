@@ -158,6 +158,18 @@ class MemberFormView extends StatelessWidget {
       FormSection(title: '⑥ 특이사항', children: [
         _text('회원 작성', 'member_note', maxLines: 3),
       ]),
+      // 하단 — 상담직원
+      Padding(
+        padding: const EdgeInsets.only(top: 2, right: 2),
+        child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+          const Text('상담직원 : ',
+              style: TextStyle(
+                  fontSize: 12.5, fontWeight: FontWeight.w700, color: kMuted)),
+          Text(_s('staff').isEmpty ? '-' : _s('staff'),
+              style: const TextStyle(
+                  fontSize: 13, fontWeight: FontWeight.w800, color: kInk)),
+        ]),
+      ),
     ]);
   }
 }
@@ -309,6 +321,17 @@ class MemberFormPreview extends StatelessWidget {
           Text(_s('member_note').isEmpty ? '-' : _s('member_note'),
               style: const TextStyle(color: _blue, fontWeight: FontWeight.w600, fontSize: 12)),
         ]),
+        // 하단 — 상담직원
+        Padding(
+          padding: const EdgeInsets.only(top: 6, right: 2),
+          child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+            const Text('상담직원 : ',
+                style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700)),
+            Text(_s('staff').isEmpty ? '________' : _s('staff'),
+                style: const TextStyle(
+                    fontSize: 12, color: _blue, fontWeight: FontWeight.w700)),
+          ]),
+        ),
       ]),
     );
   }

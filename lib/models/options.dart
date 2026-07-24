@@ -5,6 +5,9 @@ library;
 const List<String> fcList = ['정지현'];
 const List<String> trainerList = ['박트레이너', '김코치', '이트레이너', '정트레이너', '최코치'];
 
+/// 상담직원 — 문진표 하단에서 선택 (실제 직원 이름으로 교체하세요)
+const List<String> staffList = ['정지현', '박트레이너', '김코치', '이트레이너', '정트레이너', '최코치'];
+
 const List<String> genders = ['남', '여'];
 
 /// 회원 구분

@@ -136,6 +136,18 @@ class _MemberFormScreenState extends State<MemberFormScreen> {
                       ],
                     );
                   }),
+                  // 문진표 하단 — 상담직원 선택
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4, bottom: 2),
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: SizedBox(
+                        width: 240,
+                        child: DropdownField(
+                            data, 'staff', '상담직원', staffList, onChanged: _c),
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 80),
                 ],
               ),
