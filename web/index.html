@@ -47,6 +47,40 @@
       }
     })();
   </script>
+
+  <!-- 구글 드라이브/시트 실시간 연동: Google Identity Services (OAuth 토큰) -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script>
+    // OAuth 액세스 토큰을 팝업으로 요청해 Promise로 반환한다.
+    // Dart(js_interop)에서 hbgRequestGoogleToken(clientId, scope)로 호출.
+    window.hbgRequestGoogleToken = function (clientId, scope) {
+      return new Promise(function (resolve, reject) {
+        try {
+          if (!window.google || !google.accounts || !google.accounts.oauth2) {
+            reject('GIS_NOT_LOADED');
+            return;
+          }
+          var client = google.accounts.oauth2.initTokenClient({
+            client_id: clientId,
+            scope: scope,
+            callback: function (resp) {
+              if (resp && resp.access_token) {
+                resolve(resp.access_token);
+              } else {
+                reject((resp && resp.error) || 'NO_TOKEN');
+              }
+            },
+            error_callback: function (err) {
+              reject((err && (err.message || err.type)) || 'AUTH_ERROR');
+            }
+          });
+          client.requestAccessToken();
+        } catch (e) {
+          reject('' + e);
+        }
+      });
+    };
+  </script>
 </head>
 <body>
   <!--

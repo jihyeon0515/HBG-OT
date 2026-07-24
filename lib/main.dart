@@ -7,6 +7,7 @@ import 'theme.dart';
 import 'screens/member_form.dart';
 import 'screens/admin_dashboard.dart';
 import 'screens/trainer_ot.dart';
+import 'screens/google_sync.dart';
 
 void main() {
   runApp(const HbGymApp());
@@ -71,6 +72,7 @@ class RootShell extends StatelessWidget {
             icon: const Icon(Icons.more_vert),
             onSelected: (v) => _menu(context, app, v),
             itemBuilder: (_) => const [
+              PopupMenuItem(value: 'gdrive', child: Text('구글 드라이브 연동')),
               PopupMenuItem(value: 'sample', child: Text('샘플 회원 접수(테스트)')),
               PopupMenuItem(value: 'clear', child: Text('전체 데이터 삭제')),
             ],
@@ -166,7 +168,11 @@ class RootShell extends StatelessWidget {
   }
 
   void _menu(BuildContext context, AppState app, String v) {
-    if (v == 'sample') {
+    if (v == 'gdrive') {
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => const GoogleSyncScreen()),
+      );
+    } else if (v == 'sample') {
       app.createSubmission({
         'name': '김민수',
         'member_type': '신규',
