@@ -66,8 +66,8 @@ class RootShell extends StatelessWidget {
       appBar: AppBar(
         titleSpacing: 12,
         title: Row(mainAxisSize: MainAxisSize.min, children: [
-          Image.asset('assets/logo_full.png', height: 40),
-          const SizedBox(width: 12),
+          Image.asset('assets/logo_full.png', height: 26),
+          const SizedBox(width: 10),
           const Flexible(
             child: Text('헬스보이짐 분당정자점',
                 overflow: TextOverflow.ellipsis,
