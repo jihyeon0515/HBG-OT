@@ -6,6 +6,7 @@ import '../models/options.dart';
 import '../models/submission.dart';
 import '../theme.dart';
 import 'member_preview.dart';
+import 'ot_preview.dart';
 import 'submission_view.dart';
 
 // 종이 양식 색
@@ -75,11 +76,14 @@ class _TrainerOtPageState extends State<TrainerOtPage> {
           ),
         ]),
         const SizedBox(height: 4),
-        const Text('회원이 작성한 내역입니다. 트레이너는 수정할 수 없습니다.',
+        const Text('회원이 작성한 내역입니다. 썸네일을 누르면 전체 화면으로 볼 수 있습니다.',
             style: TextStyle(fontSize: 11.5, color: kMuted)),
         const SizedBox(height: 10),
-        // 수정 불가한 종이 양식(이미지) — 화면 폭에 맞춰 표시
-        MemberFormPreview(data: data, memberName: memberName),
+        // 축소 썸네일 → 클릭 시 화면에 맞춰 전체 표시 (수정 불가)
+        PreviewThumbnail(
+          title: '$memberName · 회원 작성 내용',
+          builder: () => MemberFormPreview(data: data, memberName: memberName),
+        ),
       ]),
     );
   }
