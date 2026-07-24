@@ -239,16 +239,34 @@ class SubmissionView extends StatelessWidget {
         // 트레이너 OT 작성 내용 (이미지 문진표)
         if (_showOt(sub, d)) ...[
           _sectionTitle(Icons.description, '트레이너 OT 작성 내용'),
+          if (editableNote)
+            const Padding(
+              padding: EdgeInsets.only(bottom: 6, left: 2),
+              child: Text('이미지를 눌러 열고, 관리자 서명란을 터치해 서명하세요.',
+                  style: TextStyle(fontSize: 11.5, color: kMuted)),
+            ),
           PreviewThumbnail(
             title: '${sub.memberName} · OT 문진표',
             builder: () => OtFormPreview(
                 data: d,
                 memberName: sub.memberName,
                 trainerName: sub.assignedTrainer ?? ''),
+            // 관리자: 탭하면 서명 가능한 전체화면 열기
+            onTapOverride: editableNote
+                ? () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        fullscreenDialog: true,
+                        builder: (_) => OtSignPage(
+                          data: d,
+                          memberName: sub.memberName,
+                          trainerName: sub.assignedTrainer ?? '',
+                          onChanged: onDataChanged,
+                        ),
+                      ),
+                    )
+                : null,
           ),
-          // 관리자 서명 (관리자 페이지에서만 서명 가능)
-          if (editableNote)
-            AdminSignPanel(data: d, onChanged: onDataChanged),
         ],
       ],
     );
@@ -333,91 +351,54 @@ class SubmissionView extends StatelessWidget {
   }
 }
 
-/// 관리자 서명 패널 — 관리자 페이지에서 회차별 관리자 서명(백동빈, 필기체)을 입력
-class AdminSignPanel extends StatelessWidget {
-  final Map data;
+/// 관리자용 OT 문진표 전체화면 — 이미지 안의 관리자 서명란을 터치해 서명(백동빈)
+class OtSignPage extends StatefulWidget {
+  final Map<String, dynamic> data;
+  final String memberName;
+  final String trainerName;
   final void Function(Map<String, dynamic> patch)? onChanged;
-  const AdminSignPanel({super.key, required this.data, this.onChanged});
+  const OtSignPage(
+      {super.key,
+      required this.data,
+      required this.memberName,
+      this.trainerName = '',
+      this.onChanged});
+  @override
+  State<OtSignPage> createState() => _OtSignPageState();
+}
 
-  bool _active(int i) {
-    final d = (data['os${i}_date'] ?? '').toString();
-    final p = (data['os${i}_prog'] ?? '').toString();
-    final ms = data['os${i}_msign_draw'];
-    return d.isNotEmpty ||
-        p.isNotEmpty ||
-        (ms is List && ms.isNotEmpty) ||
-        (data['os${i}_asign'] ?? '').toString().isNotEmpty;
+class _OtSignPageState extends State<OtSignPage> {
+  void _toggle(String key) {
+    final cur = (widget.data[key] ?? '').toString();
+    final val = cur.isEmpty ? '백동빈' : '';
+    setState(() => widget.data[key] = val);
+    widget.onChanged?.call({key: val});
   }
 
   @override
   Widget build(BuildContext context) {
-    final sessions = [for (var i = 1; i <= 3; i++) if (_active(i)) i];
-    if (sessions.isEmpty) return const SizedBox.shrink();
-    return Container(
-      margin: const EdgeInsets.only(top: 12),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: kYellow.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: kYellowDark),
-      ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Row(children: [
-          Icon(Icons.draw, size: 17, color: kBlack),
-          SizedBox(width: 6),
-          Text('관리자 서명',
-              style: TextStyle(
-                  fontWeight: FontWeight.w900, fontSize: 15, color: kBlack)),
-        ]),
-        const SizedBox(height: 4),
-        const Text('회차별 서명란을 터치하면 관리자(백동빈) 서명이 입력됩니다.',
-            style: TextStyle(fontSize: 11.5, color: kMuted)),
-        const SizedBox(height: 10),
-        for (final i in sessions) _row(i),
-      ]),
-    );
-  }
-
-  Widget _row(int i) {
-    final key = 'os${i}_asign';
-    final signed = (data[key] ?? '').toString().isNotEmpty;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(children: [
-        SizedBox(
-            width: 48,
-            child: Text('$i회차',
-                style: const TextStyle(
-                    fontSize: 12.5, fontWeight: FontWeight.w800))),
-        Expanded(
-          child: InkWell(
-            onTap: signed ? null : () => onChanged?.call({key: '백동빈'}),
-            child: Container(
-              height: 54,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(color: signed ? kYellowDark : kBorder),
-                borderRadius: BorderRadius.circular(9),
+    final w = MediaQuery.of(context).size.width;
+    final double formW = w < 600 ? w - 16 : 560;
+    return Scaffold(
+      backgroundColor: const Color(0xFFECECEA),
+      appBar: AppBar(title: Text('${widget.memberName} · OT 문진표 (관리자 서명)')),
+      body: Scrollbar(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          child: Center(
+            child: SizedBox(
+              width: formW,
+              child: OtFormPreview(
+                data: widget.data,
+                memberName: widget.memberName,
+                trainerName: widget.trainerName,
+                signable: true,
+                onAdminSignTap: _toggle,
               ),
-              child: signed
-                  ? Text(data[key].toString(),
-                      style: const TextStyle(
-                          fontFamily: 'NanumBrush', fontSize: 26, color: kInk))
-                  : const Text('여기를 터치해 관리자 서명',
-                      style: TextStyle(fontSize: 11.5, color: kMuted)),
             ),
           ),
         ),
-        if (signed)
-          TextButton(
-            onPressed: () => onChanged?.call({key: ''}),
-            style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 6),
-                minimumSize: const Size(0, 30)),
-            child: const Text('지우기', style: TextStyle(fontSize: 11)),
-          ),
-      ]),
+      ),
     );
   }
 }

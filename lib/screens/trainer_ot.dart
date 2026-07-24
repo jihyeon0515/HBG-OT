@@ -496,6 +496,26 @@ class _TrainerOtPageState extends State<TrainerOtPage> {
   Widget _signBox(String label, String signKey,
       {bool draw = true, String cursiveName = '', bool enabled = true}) {
     if (!draw) {
+      // 비활성: 공란으로 자리만 (관리자 페이지에서 서명)
+      if (!enabled) {
+        return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 5),
+            child: Text(label,
+                style: const TextStyle(
+                    fontSize: 12.5, fontWeight: FontWeight.w700, color: kInk)),
+          ),
+          Container(
+            width: double.infinity,
+            height: 66,
+            decoration: BoxDecoration(
+              color: const Color(0xFFFCFCFA),
+              border: Border.all(color: kBorder),
+              borderRadius: BorderRadius.circular(9),
+            ),
+          ),
+        ]);
+      }
       final signed = (data[signKey] ?? '').toString().isNotEmpty;
       return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Padding(
@@ -505,13 +525,13 @@ class _TrainerOtPageState extends State<TrainerOtPage> {
                   fontSize: 12.5, fontWeight: FontWeight.w700, color: kInk)),
         ),
         InkWell(
-          onTap: enabled ? () => setState(() => data[signKey] = cursiveName) : null,
+          onTap: () => setState(() => data[signKey] = cursiveName),
           child: Container(
             width: double.infinity,
             height: 66,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: enabled ? const Color(0xFFFCFCFA) : const Color(0xFFF0F0EE),
+              color: const Color(0xFFFCFCFA),
               border: Border.all(color: signed ? kYellowDark : kBorder),
               borderRadius: BorderRadius.circular(9),
             ),
@@ -522,11 +542,11 @@ class _TrainerOtPageState extends State<TrainerOtPage> {
                         fontSize: 30,
                         color: kInk,
                         height: 1.0))
-                : Text(enabled ? '여기를 눌러 서명' : '관리자 페이지에서 서명',
-                    style: const TextStyle(fontSize: 11.5, color: kMuted)),
+                : const Text('여기를 눌러 서명',
+                    style: TextStyle(fontSize: 11.5, color: kMuted)),
           ),
         ),
-        if (signed && enabled)
+        if (signed)
           Align(
             alignment: Alignment.centerRight,
             child: TextButton(

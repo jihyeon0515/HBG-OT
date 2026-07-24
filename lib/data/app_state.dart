@@ -185,8 +185,7 @@ class AppState extends ChangeNotifier {
       's1_name': '벤치프레스', 's1_w1': '40', 's1_w2': '50', 's1_rep': '10', 's1_lv': '중',
       'os1_date': '2026-07-23', 'os1_time': '19:00', 'os1_prog': '스쿼트 / 레그프레스',
       'os1_cardio': ['런닝머신'], 'os1_ctime': '20분',
-      'os1_msign': '최완료', 'os1_mfont': 'NanumPen',
-      'os1_asign': '김코치', 'os1_afont': 'Gaegu',
+      'os1_asign': '백동빈',
       'trainer_note': '무릎 통증 고려해 하체 고중량은 4주 후부터 진행.',
     });
     setOutcome(s3.id, SubStatus.success); // 데모: 김코치가 성공으로 완료

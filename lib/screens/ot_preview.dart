@@ -12,11 +12,13 @@ class PreviewThumbnail extends StatelessWidget {
   final Widget Function() builder;
   final String title;
   final double naturalWidth;
+  final VoidCallback? onTapOverride; // 지정 시 기본 전체화면 대신 이 동작
   const PreviewThumbnail(
       {super.key,
       required this.builder,
       required this.title,
-      this.naturalWidth = 560});
+      this.naturalWidth = 560,
+      this.onTapOverride});
 
   void _openFull(BuildContext context) {
     Navigator.push(
@@ -45,7 +47,7 @@ class PreviewThumbnail extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       GestureDetector(
-        onTap: () => _openFull(context),
+        onTap: onTapOverride ?? () => _openFull(context),
         child: Container(
           width: 300,
           height: 300,
@@ -88,11 +90,15 @@ class OtFormPreview extends StatelessWidget {
   final Map<String, dynamic> data;
   final String memberName;
   final String trainerName;
+  final bool signable; // 관리자 서명 클릭 가능 여부
+  final void Function(String signKey)? onAdminSignTap;
   const OtFormPreview(
       {super.key,
       required this.data,
       required this.memberName,
-      this.trainerName = ''});
+      this.trainerName = '',
+      this.signable = false,
+      this.onAdminSignTap});
 
   String _s(String k) => (data[k] ?? '').toString();
 
@@ -260,26 +266,45 @@ class OtFormPreview extends StatelessWidget {
         const SizedBox(height: 4),
         Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
           const Text('회원서명 ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
-          _signText('${p}_msign', '${p}_mfont'),
+          _signText('${p}_msign'),
           const SizedBox(width: 14),
           const Text('관리자서명 ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
-          _signText('${p}_asign', '${p}_afont'),
+          _signText('${p}_asign', admin: true),
         ]),
       ]),
     );
   }
 
-  // 서명: 직접 그린 서명 또는 필기체 이름 (없으면 밑줄)
-  Widget _signText(String signKey, String fontKey) {
+  // 서명: 직접 그린 서명 또는 필기체 이름. admin+signable 이면 클릭해 서명.
+  Widget _signText(String signKey, {bool admin = false}) {
     final draw = data['${signKey}_draw'];
     if (draw is List && draw.isNotEmpty) {
       return SignatureView(strokes: draw, width: 96, height: 34);
     }
     final name = _s(signKey);
     if (name.isNotEmpty) {
-      return Text(name,
+      final t = Text(name,
           style: const TextStyle(
               fontFamily: 'NanumBrush', fontSize: 20, color: _blue));
+      if (admin && signable) {
+        return GestureDetector(
+            onTap: () => onAdminSignTap?.call(signKey), child: t);
+      }
+      return t;
+    }
+    if (admin && signable) {
+      // 빈 관리자 서명 — 클릭하면 서명
+      return GestureDetector(
+        onTap: () => onAdminSignTap?.call(signKey),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          decoration: BoxDecoration(
+              border: Border.all(color: _blue),
+              borderRadius: BorderRadius.circular(4)),
+          child: const Text('터치하여 서명',
+              style: TextStyle(fontSize: 10.5, color: _blue, fontWeight: FontWeight.w700)),
+        ),
+      );
     }
     return const Text('___',
         style: TextStyle(fontSize: 12, color: Colors.black38));
