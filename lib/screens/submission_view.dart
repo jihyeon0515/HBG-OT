@@ -232,10 +232,12 @@ class SubmissionView extends StatelessWidget {
         // 회원 작성 내용 — 수정 불가한 종이 양식(이미지)로 화면 폭에 맞춰 표시
         _sectionTitle(Icons.assignment_ind, '회원 작성 내용'),
         MemberFormPreview(data: d, memberName: sub.memberName),
-        // 특이사항 (관리자 편집 가능)
-        if (editableNote)
+        // 직원 MEMO (읽기 전용) → 관리자 MEMO (편집 가능)
+        if (editableNote) ...[
+          _staffMemoBox(d),
           SpecialNoteBox(
               data: d, editable: true, onChanged: onNoteChanged),
+        ],
         // 트레이너 OT 작성 내용 (이미지 문진표)
         if (_showOt(sub, d)) ...[
           _sectionTitle(Icons.description, '트레이너 OT 작성 내용'),
@@ -269,6 +271,32 @@ class SubmissionView extends StatelessWidget {
           ),
         ],
       ],
+    );
+  }
+
+  /// 직원 MEMO (회원 접수 시 직원이 작성) — 관리자 페이지에서 읽기 전용 표시
+  Widget _staffMemoBox(Map d) {
+    final t = (d['staff_memo'] ?? '').toString().trim();
+    return Container(
+      margin: const EdgeInsets.only(top: 12),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF1F1EC),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFD9D9D2)),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const Row(children: [
+          Icon(Icons.badge, size: 17, color: kBlack),
+          SizedBox(width: 6),
+          Text('직원 MEMO',
+              style: TextStyle(
+                  fontWeight: FontWeight.w900, fontSize: 15, color: kBlack)),
+        ]),
+        const SizedBox(height: 8),
+        Text(t.isEmpty ? '-' : t,
+            style: const TextStyle(fontSize: 13.5, color: kInk)),
+      ]),
     );
   }
 
