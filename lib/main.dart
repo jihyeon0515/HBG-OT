@@ -67,7 +67,7 @@ class RootShell extends StatelessWidget {
         titleSpacing: 12,
         title: Row(children: [
           Image.asset('assets/logo_full.png', height: 18),
-          const Spacer(),
+          const SizedBox(width: 10),
           const Flexible(
             child: Text('헬스보이짐 분당정자점',
                 overflow: TextOverflow.ellipsis,
