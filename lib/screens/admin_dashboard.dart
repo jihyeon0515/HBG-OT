@@ -152,14 +152,16 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             : base.where((e) => e.status == statusFilter).toList();
         return LayoutBuilder(builder: (ctx, cons) {
           final narrow = cons.maxWidth < 700;
-          // 모바일 목록: 배너·필터가 리스트와 함께 세로로 스크롤되어 화면을 넓게 씀
-          if (narrow && !boardView) {
+          // 모바일: 배너·필터가 목록/보드와 함께 세로로 스크롤되어 화면을 넓게 씀
+          if (narrow) {
             return SingleChildScrollView(
               child: Column(
                 children: [
                   _statusBanner(base),
                   _filterBar(),
-                  _list(context, shown, outerScroll: false),
+                  boardView
+                      ? _board(context, base, outerScroll: true)
+                      : _list(context, shown, outerScroll: false),
                 ],
               ),
             );
@@ -439,7 +441,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   }
 
   // -------------------- 트레이너별 보드 --------------------
-  Widget _board(BuildContext context, List<Submission> base) {
+  // outerScroll=true: 배너·필터와 함께 세로 스크롤(모바일). 각 열은 내용만큼 늘어남.
+  Widget _board(BuildContext context, List<Submission> base,
+      {bool outerScroll = false}) {
     // 배너(상태) 필터를 보드에도 그대로 적용
     final shown = statusFilter == null
         ? base
@@ -468,10 +472,12 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             children: [
               // 미배정(접수) 열 — 담당자 미지정 회원
               if (trainerFilter == null && unassigned.isNotEmpty)
-                _column(context, '미배정', unassigned, unassigned: true),
+                _column(context, '미배정', unassigned,
+                    unassigned: true, bounded: !outerScroll),
               for (final t in cols)
                 _column(context, t,
-                    shown.where((e) => e.assignedTrainer == t).toList()),
+                    shown.where((e) => e.assignedTrainer == t).toList(),
+                    bounded: !outerScroll),
             ],
           ),
         ),
@@ -480,7 +486,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   }
 
   Widget _column(BuildContext context, String title, List<Submission> members,
-      {bool unassigned = false}) {
+      {bool unassigned = false, bool bounded = true}) {
     members = [...members]
       ..sort((a, b) => a.status.index.compareTo(b.status.index));
     return Container(
@@ -523,24 +529,34 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             ]),
           ),
           // 회원 세로 나열
-          Flexible(
-            child: members.isEmpty
-                ? const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 24),
-                    child: Text('해당 회원 없음',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: kMuted, fontSize: 12.5)),
-                  )
-                : ListView.builder(
-                    shrinkWrap: true,
-                    padding: const EdgeInsets.all(8),
-                    itemCount: members.length,
-                    itemBuilder: (_, i) => _boardCard(context, members[i]),
-                  ),
-          ),
+          _columnBody(context, members, bounded),
         ],
       ),
     );
+  }
+
+  Widget _columnBody(
+      BuildContext context, List<Submission> members, bool bounded) {
+    if (members.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 24),
+        child: Text('해당 회원 없음',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: kMuted, fontSize: 12.5)),
+      );
+    }
+    final list = ListView.builder(
+      shrinkWrap: true,
+      // bounded=false(모바일 외곽 스크롤)일 때는 자체 스크롤 없이 내용만큼 늘어남
+      physics: bounded
+          ? const AlwaysScrollableScrollPhysics()
+          : const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.all(8),
+      itemCount: members.length,
+      itemBuilder: (_, i) => _boardCard(context, members[i]),
+    );
+    // bounded=true: 남은 높이 안에서 열 내부 스크롤 / false: 내용 높이 그대로
+    return bounded ? Flexible(child: list) : list;
   }
 
   // 진행 중인 OT 차수 (내용이 있는 가장 높은 회차, 없으면 1)
