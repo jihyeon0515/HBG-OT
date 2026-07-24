@@ -341,25 +341,75 @@ class _TrainerOtPageState extends State<TrainerOtPage> {
         labelW: 66,
       );
 
+  Widget _labelCell(String t, double w) => Container(
+        width: w,
+        color: _pHdr,
+        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 8),
+        alignment: Alignment.centerLeft,
+        child: Text(t,
+            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800)),
+      );
+
+  Widget _valCell(String v) => Expanded(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          child: Text(v.isEmpty ? '-' : v,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                  fontSize: 12, color: _pBlue, fontWeight: FontWeight.w700)),
+        ),
+      );
+
   /// 트레이너 작성 종이 양식(이미지) — 각 칸을 탭하여 입력/선택
   Widget _trainerPaper() {
+    final trainer = context.read<AppState>().currentTrainer ?? '';
+    final vline = Container(width: 1, color: _pLine);
     return Container(
       decoration: BoxDecoration(
           color: Colors.white,
           border: Border.all(color: _pLine, width: 1.4),
           borderRadius: BorderRadius.circular(6)),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(14),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          Image.asset('assets/logo.png', height: 26),
-          const SizedBox(width: 8),
-          const Text('OT 기록',
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900)),
+        // 헤더: 로고 + 타이틀
+        Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+          Image.asset('assets/logo.png', height: 32),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: const [
+                  Text('OT 기록지',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+                  Text('ORIENTATION  RECORD',
+                      style: TextStyle(
+                          fontSize: 9.5,
+                          letterSpacing: 2.5,
+                          color: Colors.black45,
+                          fontWeight: FontWeight.w700)),
+                ]),
+          ),
         ]),
         Container(
-            height: 4,
+            height: 5,
             color: _pLine,
-            margin: const EdgeInsets.symmetric(vertical: 8)),
+            margin: const EdgeInsets.symmetric(vertical: 9)),
+        // 회원 · 담당 트레이너 정보 표
+        Container(
+          decoration: BoxDecoration(border: Border.all(color: _pLine)),
+          child: IntrinsicHeight(
+            child: Row(children: [
+              _labelCell('회원명', 64),
+              vline,
+              _valCell(memberName),
+              vline,
+              _labelCell('담당T', 52),
+              vline,
+              _valCell(trainer),
+            ]),
+          ),
+        ),
+        const SizedBox(height: 12),
         _psection('InBody 분석', [
           _pInbody('체중', 'w_now', 'w_goal'),
           _pInbody('체지방량', 'f_now', 'f_goal'),
@@ -370,6 +420,14 @@ class _TrainerOtPageState extends State<TrainerOtPage> {
         _psection('트레이너 메모', [
           _ptext('trainer_note', hint: '트레이너 메모', maxLines: 3),
         ]),
+        const SizedBox(height: 8),
+        Center(child: Image.asset('assets/logo.png', height: 24)),
+        const SizedBox(height: 2),
+        const Center(
+          child: Text('HEALTH BOY GYM · 분당정자점',
+              style: TextStyle(
+                  fontSize: 10, color: Colors.black45, fontWeight: FontWeight.w700)),
+        ),
       ]),
     );
   }

@@ -217,7 +217,7 @@ class _MemberFormScreenState extends State<MemberFormScreen> {
                           Row(children: [
                             Image.asset('assets/logo.png', height: 30),
                             const SizedBox(width: 8),
-                            const Text('상담 문진표',
+                            const Text('신규회원 상담 문진표',
                                 style: TextStyle(
                                     fontSize: 15, fontWeight: FontWeight.w900)),
                           ]),
