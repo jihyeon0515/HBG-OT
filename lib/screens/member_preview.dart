@@ -341,10 +341,16 @@ class MemberFormPreview extends StatelessWidget {
         _section('운동 성격', [
           _chkMulti('persona', personaOptions),
         ]),
-        _section('특이사항 (회원 작성)', [
+        _section('특이사항 (회원작성)', [
           Text(_s('member_note').isEmpty ? '-' : _s('member_note'),
               style: const TextStyle(color: _blue, fontWeight: FontWeight.w600, fontSize: 12)),
         ]),
+        if (_s('staff_memo').isNotEmpty)
+          _section('직원 MEMO', [
+            Text(_s('staff_memo'),
+                style: const TextStyle(
+                    color: _blue, fontWeight: FontWeight.w600, fontSize: 12)),
+          ]),
       ]),
     );
   }

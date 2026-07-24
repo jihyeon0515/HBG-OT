@@ -176,6 +176,48 @@ class _MemberFormScreenState extends State<MemberFormScreen> {
     );
   }
 
+  /// 직원 MEMO — 종이 이미지 아래 (관리자 메모와 동일한 스타일)
+  Widget _staffMemo() {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: kYellow.withValues(alpha: 0.18),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: kYellowDark),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const Row(children: [
+          Icon(Icons.push_pin, size: 17, color: kBlack),
+          SizedBox(width: 6),
+          Text('직원 MEMO',
+              style: TextStyle(
+                  fontWeight: FontWeight.w900, fontSize: 15, color: kBlack)),
+        ]),
+        const SizedBox(height: 8),
+        TextFormField(
+          key: ValueKey('staff_memo-$_epoch'),
+          initialValue: (data['staff_memo'] ?? '').toString(),
+          minLines: 3,
+          maxLines: 8,
+          style: const TextStyle(fontSize: 13.5),
+          decoration: InputDecoration(
+            hintText: '상담 직원이 작성하는 메모 (선택)',
+            filled: true,
+            fillColor: Colors.white,
+            isDense: true,
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(9),
+                borderSide: const BorderSide(color: kYellowDark)),
+            enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(9),
+                borderSide: const BorderSide(color: kBorder)),
+          ),
+          onChanged: (v) => data['staff_memo'] = v,
+        ),
+      ]),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -279,14 +321,17 @@ class _MemberFormScreenState extends State<MemberFormScreen> {
                           _psection('운동 성격 (중복선택)', [
                             _pchk('persona', personaOptions, column: true),
                           ]),
-                          // 특이사항
-                          _psection('특이사항', [
+                          // 특이사항 (회원작성)
+                          _psection('특이사항 (회원작성)', [
                             _ptext('member_note',
                                 hint: '통증 부위, 알레르기, 원하는 시간대 등 트레이너에게 전할 내용 (선택)',
                                 maxLines: 3),
                           ]),
                         ]),
                   ),
+                  const SizedBox(height: 12),
+                  // 이미지 아래 — 직원 MEMO
+                  _staffMemo(),
                   const SizedBox(height: 80),
                 ],
               ),
