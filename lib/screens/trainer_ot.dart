@@ -5,6 +5,7 @@ import '../data/app_state.dart';
 import '../models/options.dart';
 import '../models/submission.dart';
 import '../theme.dart';
+import '../widgets/signature_pad.dart';
 import 'member_preview.dart';
 import 'ot_preview.dart';
 import 'submission_view.dart';
@@ -480,24 +481,18 @@ class _TrainerOtPageState extends State<TrainerOtPage> {
       ),
       const SizedBox(height: 10),
       Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Expanded(child: _signBox('회원 서명', memberName, '${p}_msign', '${p}_mfont')),
+        Expanded(child: _signBox('회원 서명', '${p}_msign')),
         const SizedBox(width: 10),
-        Expanded(
-            child: _signBox(
-                '관리자 서명',
-                context.read<AppState>().currentTrainer ?? '관리자',
-                '${p}_asign',
-                '${p}_afont')),
+        Expanded(child: _signBox('관리자 서명', '${p}_asign')),
       ]),
     ]);
   }
 
-  /// 이름을 손글씨 글꼴로 렌더링해 '실제 서명'처럼 보여주는 입력 위젯.
-  /// 버튼이 아니라 글꼴만 선택하면 이름이 그대로 서명으로 입력된다.
-  Widget _signBox(String label, String name, String signKey, String fontKey) {
-    final font = (data[fontKey] ?? '').toString();
-    final signed = (data[signKey] ?? '').toString().isNotEmpty && font.isNotEmpty;
-    final preview = name.isEmpty ? '가' : name.substring(0, 1);
+  /// 직접 그리는 서명칸 — 탭하면 그리기 창이 열리고, 그린 서명을 이미지로 표시
+  Widget _signBox(String label, String signKey) {
+    final drawKey = '${signKey}_draw';
+    final strokes = data[drawKey];
+    final signed = strokes is List && strokes.isNotEmpty;
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Padding(
         padding: const EdgeInsets.only(bottom: 5),
@@ -505,84 +500,44 @@ class _TrainerOtPageState extends State<TrainerOtPage> {
             style: const TextStyle(
                 fontSize: 12.5, fontWeight: FontWeight.w700, color: kInk)),
       ),
-      // 서명 표시
-      Container(
-        width: double.infinity,
-        height: 58,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: const Color(0xFFFAFAF8),
-          border: Border.all(color: signed ? kYellowDark : kBorder),
-          borderRadius: BorderRadius.circular(9),
+      InkWell(
+        onTap: () => _openSignPad(label, drawKey),
+        child: Container(
+          width: double.infinity,
+          height: 66,
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFCFCFA),
+            border: Border.all(color: signed ? kYellowDark : kBorder),
+            borderRadius: BorderRadius.circular(9),
+          ),
+          child: signed
+              ? SignatureView(strokes: strokes)
+              : const Center(
+                  child: Text('여기를 눌러 직접 서명',
+                      style: TextStyle(fontSize: 11.5, color: kMuted))),
         ),
-        child: signed
-            ? Text(name,
-                style: TextStyle(
-                    fontFamily: font, fontSize: 28, color: kInk, height: 1.0))
-            : const Text('글꼴을 선택하면 이름이 서명됩니다',
-                style: TextStyle(fontSize: 11.5, color: kMuted)),
       ),
-      const SizedBox(height: 6),
-      // 글꼴 선택 (이름과 동일하게 선택만)
-      Wrap(spacing: 6, runSpacing: 6, children: [
-        for (final f in signFonts)
-          _fontChip(
-            f['name']!,
-            f['family']!,
-            preview,
-            selected: signed && font == f['family'],
-            onTap: () {
-              data[fontKey] = f['family'];
-              data[signKey] = name;
-              _c();
-            },
-          ),
-        InkWell(
-          onTap: () {
-            data[fontKey] = '';
-            data[signKey] = '';
-            _c();
-          },
-          borderRadius: BorderRadius.circular(20),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
-            decoration: BoxDecoration(
-                border: Border.all(color: kBorder),
-                borderRadius: BorderRadius.circular(20)),
-            child: const Text('지우기',
-                style: TextStyle(fontSize: 12, color: kMuted)),
+      if (signed)
+        Align(
+          alignment: Alignment.centerRight,
+          child: TextButton(
+            onPressed: () => _openSignPad(label, drawKey),
+            style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 6),
+                minimumSize: const Size(0, 30)),
+            child: const Text('다시 서명', style: TextStyle(fontSize: 11)),
           ),
         ),
-      ]),
     ]);
   }
 
-  Widget _fontChip(String label, String family, String preview,
-      {required bool selected, required VoidCallback onTap}) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
-        decoration: BoxDecoration(
-          color: selected ? kBlack : Colors.white,
-          border: Border.all(color: selected ? kBlack : kBorder),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Row(mainAxisSize: MainAxisSize.min, children: [
-          Text('$label ',
-              style: TextStyle(
-                  fontSize: 11.5,
-                  fontWeight: FontWeight.w700,
-                  color: selected ? kYellow : kInk)),
-          Text(preview,
-              style: TextStyle(
-                  fontFamily: family,
-                  fontSize: 16,
-                  color: selected ? kYellow : kMuted)),
-        ]),
-      ),
-    );
+  Future<void> _openSignPad(String label, String drawKey) async {
+    final result = await showSignatureDialog(context,
+        title: label, initial: data[drawKey]);
+    if (result != null) {
+      setState(() => data[drawKey] = result);
+    }
   }
 }
 

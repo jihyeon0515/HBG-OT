@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme.dart';
+import '../widgets/signature_pad.dart';
 
 const _blue = Color(0xFF0B3F8F);
 const _line = Color(0xFF222222);
@@ -268,19 +269,14 @@ class OtFormPreview extends StatelessWidget {
     );
   }
 
-  // 서명: 이름을 선택한 손글씨 글꼴로 렌더링
+  // 서명: 직접 그린 서명을 렌더 (없으면 밑줄)
   Widget _signText(String signKey, String fontKey) {
-    final name = _s(signKey);
-    final font = _s(fontKey);
-    if (name.isEmpty) {
-      return const Text('___',
-          style: TextStyle(fontSize: 12, color: Colors.black38));
+    final draw = data['${signKey}_draw'];
+    if (draw is List && draw.isNotEmpty) {
+      return SignatureView(strokes: draw, width: 96, height: 34);
     }
-    return Text(name,
-        style: TextStyle(
-            fontFamily: font.isEmpty ? null : font,
-            fontSize: 18,
-            color: _blue));
+    return const Text('___',
+        style: TextStyle(fontSize: 12, color: Colors.black38));
   }
 
   Widget _multiline(String k, String label) {
