@@ -150,14 +150,29 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         final shown = statusFilter == null
             ? base
             : base.where((e) => e.status == statusFilter).toList();
-        return Column(
-          children: [
-            _statusBanner(base),
-            _filterBar(),
-            Expanded(
-                child: boardView ? _board(context, base) : _list(context, shown)),
-          ],
-        );
+        return LayoutBuilder(builder: (ctx, cons) {
+          final narrow = cons.maxWidth < 700;
+          // 모바일 목록: 배너·필터가 리스트와 함께 세로로 스크롤되어 화면을 넓게 씀
+          if (narrow && !boardView) {
+            return SingleChildScrollView(
+              child: Column(
+                children: [
+                  _statusBanner(base),
+                  _filterBar(),
+                  _list(context, shown, outerScroll: false),
+                ],
+              ),
+            );
+          }
+          return Column(
+            children: [
+              _statusBanner(base),
+              _filterBar(),
+              Expanded(
+                  child: boardView ? _board(context, base) : _list(context, shown)),
+            ],
+          );
+        });
       },
     );
   }
@@ -648,10 +663,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     ('예약일시', 136), ('종목', 120), ('담당자', 68), ('진행현황', 78), ('상태', 58),
   ];
 
-  Widget _list(BuildContext context, List<Submission> subs) {
+  Widget _list(BuildContext context, List<Submission> subs,
+      {bool outerScroll = true}) {
     if (subs.isEmpty) {
-      return const Center(
-          child: Text('해당 조건의 항목이 없습니다.', style: TextStyle(color: kMuted)));
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 40),
+        child: Center(
+            child: Text('해당 조건의 항목이 없습니다.', style: TextStyle(color: kMuted))),
+      );
     }
     subs.sort((a, b) => sortDesc
         ? b.createdAt.compareTo(a.createdAt)
@@ -674,15 +693,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             _rowFor(context, i + 1, subs[i], widths, last: i == subs.length - 1),
         ]),
       );
-      return Scrollbar(
+      // 헤더(배너·필터)와 함께 세로 스크롤하는 모바일에서는 자체 세로 스크롤 제거
+      final horizontal = Padding(
+        padding: const EdgeInsets.all(10),
         child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(10),
-            child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal, child: table),
-          ),
-        ),
+            scrollDirection: Axis.horizontal, child: table),
       );
+      if (!outerScroll) return horizontal;
+      return Scrollbar(child: SingleChildScrollView(child: horizontal));
     });
   }
 
