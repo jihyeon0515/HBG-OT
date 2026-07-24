@@ -64,6 +64,18 @@ flutter:
     - assets/body.jpg
     - assets/logo.png
 
+  # 서명용 손글씨 글꼴 (OFL, Google Fonts)
+  fonts:
+    - family: Gaegu
+      fonts:
+        - asset: assets/fonts/Gaegu-Regular.ttf
+    - family: NanumPen
+      fonts:
+        - asset: assets/fonts/NanumPenScript-Regular.ttf
+    - family: NanumBrush
+      fonts:
+        - asset: assets/fonts/NanumBrushScript-Regular.ttf
+
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

@@ -83,11 +83,11 @@ final List<String> exTimeOptions =
 final List<String> cardioTimeOptions =
     [for (var m = 10; m <= 60; m += 5) '$m분'];
 
-/// 서명 글꼴
+/// 서명 글꼴 (이름을 이 손글씨 글꼴로 렌더링해 서명처럼 표시)
 const List<Map<String, String>> signFonts = [
-  {'name': '궁서체', 'family': 'GungsuhChe'},
-  {'name': '휴먼편지체', 'family': 'HYPMokGak'},
-  {'name': '기본', 'family': ''},
+  {'name': '정자체', 'family': 'Gaegu'},
+  {'name': '펜글씨', 'family': 'NanumPen'},
+  {'name': '붓글씨', 'family': 'NanumBrush'},
 ];
 
 /// 전국 시/도 → 시/군/구

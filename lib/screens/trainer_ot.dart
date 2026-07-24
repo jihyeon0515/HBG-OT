@@ -215,8 +215,6 @@ class _TrainerOtPageState extends State<TrainerOtPage> {
 
   Widget _sessionSection(int i) {
     final p = 'os$i';
-    final signedM = (data['${p}_msign'] ?? '').toString().isNotEmpty;
-    final signedA = (data['${p}_asign'] ?? '').toString().isNotEmpty;
     return FormSection(title: '②-$i  $i회차 오티', children: [
       Row(children: [
         Expanded(child: DateField(data, '${p}_date', '날짜', onChanged: _c)),
@@ -236,34 +234,111 @@ class _TrainerOtPageState extends State<TrainerOtPage> {
                 cardioTimeOptions, onChanged: _c)),
       ]),
       ChipsField(data, '${p}_cardio', '유산소 종류 (중복)', cardioOptions, onChanged: _c),
-      Row(children: [
+      const SizedBox(height: 4),
+      Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Expanded(child: _signBox('회원 서명', memberName, '${p}_msign', '${p}_mfont')),
+        const SizedBox(width: 10),
         Expanded(
-          child: SwitchListTile(
-            contentPadding: EdgeInsets.zero,
-            dense: true,
-            title: const Text('회원 서명', style: TextStyle(fontSize: 13)),
-            value: signedM,
-            onChanged: (v) {
-              data['${p}_msign'] = v ? memberName : '';
+            child: _signBox(
+                '관리자 서명',
+                context.read<AppState>().currentTrainer ?? '관리자',
+                '${p}_asign',
+                '${p}_afont')),
+      ]),
+    ]);
+  }
+
+  /// 이름을 손글씨 글꼴로 렌더링해 '실제 서명'처럼 보여주는 입력 위젯.
+  /// 버튼이 아니라 글꼴만 선택하면 이름이 그대로 서명으로 입력된다.
+  Widget _signBox(String label, String name, String signKey, String fontKey) {
+    final font = (data[fontKey] ?? '').toString();
+    final signed = (data[signKey] ?? '').toString().isNotEmpty && font.isNotEmpty;
+    final preview = name.isEmpty ? '가' : name.substring(0, 1);
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Padding(
+        padding: const EdgeInsets.only(bottom: 5),
+        child: Text(label,
+            style: const TextStyle(
+                fontSize: 12.5, fontWeight: FontWeight.w700, color: kInk)),
+      ),
+      // 서명 표시
+      Container(
+        width: double.infinity,
+        height: 58,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: const Color(0xFFFAFAF8),
+          border: Border.all(color: signed ? kYellowDark : kBorder),
+          borderRadius: BorderRadius.circular(9),
+        ),
+        child: signed
+            ? Text(name,
+                style: TextStyle(
+                    fontFamily: font, fontSize: 28, color: kInk, height: 1.0))
+            : const Text('글꼴을 선택하면 이름이 서명됩니다',
+                style: TextStyle(fontSize: 11.5, color: kMuted)),
+      ),
+      const SizedBox(height: 6),
+      // 글꼴 선택 (이름과 동일하게 선택만)
+      Wrap(spacing: 6, runSpacing: 6, children: [
+        for (final f in signFonts)
+          _fontChip(
+            f['name']!,
+            f['family']!,
+            preview,
+            selected: signed && font == f['family'],
+            onTap: () {
+              data[fontKey] = f['family'];
+              data[signKey] = name;
               _c();
             },
           ),
-        ),
-        Expanded(
-          child: SwitchListTile(
-            contentPadding: EdgeInsets.zero,
-            dense: true,
-            title: const Text('관리자 서명', style: TextStyle(fontSize: 13)),
-            value: signedA,
-            onChanged: (v) {
-              data['${p}_asign'] =
-                  v ? (context.read<AppState>().currentTrainer ?? '관리자') : '';
-              _c();
-            },
+        InkWell(
+          onTap: () {
+            data[fontKey] = '';
+            data[signKey] = '';
+            _c();
+          },
+          borderRadius: BorderRadius.circular(20),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
+            decoration: BoxDecoration(
+                border: Border.all(color: kBorder),
+                borderRadius: BorderRadius.circular(20)),
+            child: const Text('지우기',
+                style: TextStyle(fontSize: 12, color: kMuted)),
           ),
         ),
       ]),
     ]);
+  }
+
+  Widget _fontChip(String label, String family, String preview,
+      {required bool selected, required VoidCallback onTap}) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
+        decoration: BoxDecoration(
+          color: selected ? kBlack : Colors.white,
+          border: Border.all(color: selected ? kBlack : kBorder),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          Text('$label ',
+              style: TextStyle(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w700,
+                  color: selected ? kYellow : kInk)),
+          Text(preview,
+              style: TextStyle(
+                  fontFamily: family,
+                  fontSize: 16,
+                  color: selected ? kYellow : kMuted)),
+        ]),
+      ),
+    );
   }
 }
 

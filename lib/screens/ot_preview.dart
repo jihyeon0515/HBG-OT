@@ -307,15 +307,30 @@ class OtFormPreview extends StatelessWidget {
           _v('${p}_next'),
         ]),
         const SizedBox(height: 4),
-        Row(children: [
+        Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
           const Text('회원서명 ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
-          Text(_s('${p}_msign'), style: const TextStyle(fontSize: 12, color: _blue, fontWeight: FontWeight.w700)),
+          _signText('${p}_msign', '${p}_mfont'),
           const SizedBox(width: 14),
           const Text('관리자서명 ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
-          Text(_s('${p}_asign'), style: const TextStyle(fontSize: 12, color: _blue, fontWeight: FontWeight.w700)),
+          _signText('${p}_asign', '${p}_afont'),
         ]),
       ]),
     );
+  }
+
+  // 서명: 이름을 선택한 손글씨 글꼴로 렌더링
+  Widget _signText(String signKey, String fontKey) {
+    final name = _s(signKey);
+    final font = _s(fontKey);
+    if (name.isEmpty) {
+      return const Text('___',
+          style: TextStyle(fontSize: 12, color: Colors.black38));
+    }
+    return Text(name,
+        style: TextStyle(
+            fontFamily: font.isEmpty ? null : font,
+            fontSize: 18,
+            color: _blue));
   }
 
   Widget _multiline(String k, String label) {
