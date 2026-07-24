@@ -46,35 +46,59 @@ class _TrainerOtPageState extends State<TrainerOtPage> {
     );
   }
 
-  /// 회원이 작성한 전체 내역 (OT 작성 화면 상단)
+  /// 회원이 작성한 전체 내역 (읽기 전용) — 회색 카드로 명확히 구분
   Widget _memberSummary() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          margin: const EdgeInsets.only(top: 2, bottom: 2),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
-          decoration: BoxDecoration(
-              color: kBlack, borderRadius: BorderRadius.circular(10)),
-          child: const Row(children: [
-            Icon(Icons.assignment_ind, size: 18, color: kYellow),
-            SizedBox(width: 7),
-            Text('회원 작성 내역',
-                style: TextStyle(
-                    fontWeight: FontWeight.w900, fontSize: 15, color: kYellow)),
-          ]),
-        ),
-        const SizedBox(height: 8),
-        MemberFormView(data: data),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF1F1EC),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFD9D9D2), width: 1.4),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+                color: kBlack, borderRadius: BorderRadius.circular(8)),
+            child: const Row(mainAxisSize: MainAxisSize.min, children: [
+              Icon(Icons.person, size: 15, color: kYellow),
+              SizedBox(width: 5),
+              Text('회원 작성 (읽기 전용)',
+                  style: TextStyle(
+                      fontWeight: FontWeight.w900, fontSize: 13, color: kYellow)),
+            ]),
+          ),
+        ]),
         const SizedBox(height: 4),
-        const Divider(thickness: 1.5),
-        const Padding(
-          padding: EdgeInsets.only(top: 6, bottom: 2),
-          child: Text('▼ 아래부터 트레이너 작성',
-              style: TextStyle(fontWeight: FontWeight.w800, color: kMuted)),
+        const Text('회원이 작성한 내역입니다. 트레이너는 수정할 수 없습니다.',
+            style: TextStyle(fontSize: 11.5, color: kMuted)),
+        const SizedBox(height: 10),
+        MemberFormView(data: data),
+      ]),
+    );
+  }
+
+  /// 트레이너 작성 영역 시작 헤더 — 노란 배너로 회원란과 뚜렷이 구분
+  Widget _trainerHeader() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: kYellow,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: kYellowDark, width: 1.4),
+      ),
+      child: const Row(children: [
+        Icon(Icons.edit_note, size: 22, color: kBlack),
+        SizedBox(width: 8),
+        Expanded(
+          child: Text('트레이너 작성 (OT 평가 · 프로그램)',
+              style: TextStyle(
+                  fontWeight: FontWeight.w900, fontSize: 15.5, color: kBlack)),
         ),
-        const SizedBox(height: 6),
-      ],
+      ]),
     );
   }
 
@@ -122,6 +146,7 @@ class _TrainerOtPageState extends State<TrainerOtPage> {
         padding: const EdgeInsets.all(14),
         children: [
           _memberSummary(),
+          _trainerHeader(),
           FormSection(title: '① InBody 분석', children: [
             _pair('체중', 'w_now', '목표', 'w_goal'),
             _pair('체지방량', 'f_now', '목표', 'f_goal'),
@@ -215,6 +240,9 @@ class _TrainerOtPageState extends State<TrainerOtPage> {
 
   Widget _sessionSection(int i) {
     final p = 'os$i';
+    // 다음 오티 일정 = 다음 회차(i+1)의 날짜/시간과 같은 값 → 입력하면 다음 회차에 자동 반영
+    final nextDateKey = i < 3 ? 'os${i + 1}_date' : 'os3_ndate';
+    final nextTimeKey = i < 3 ? 'os${i + 1}_time' : 'os3_ntime';
     return FormSection(title: '②-$i  $i회차 오티', children: [
       Row(children: [
         Expanded(child: DateField(data, '${p}_date', '날짜', onChanged: _c)),
@@ -225,7 +253,37 @@ class _TrainerOtPageState extends State<TrainerOtPage> {
       ]),
       TextField2(data, '${p}_prog', '운동 프로그램 내용', maxLines: 3, onChanged: _c),
       TextField2(data, '${p}_tip', 'tip 메모', maxLines: 2, onChanged: _c),
-      DateField(data, '${p}_next', '다음 오티 일정', onChanged: _c),
+      // 다음 오티 일정 (날짜 + 시간 드롭다운)
+      Container(
+        margin: const EdgeInsets.only(top: 4, bottom: 6),
+        padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFFF9E3),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: kYellowDark),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            const Icon(Icons.event_repeat, size: 16, color: kBlack),
+            const SizedBox(width: 5),
+            Text(
+                i < 3
+                    ? '다음 오티 일정  (입력 시 ${i + 1}회차 날짜·시간에 자동 입력)'
+                    : '다음 오티 일정',
+                style: const TextStyle(
+                    fontSize: 12, fontWeight: FontWeight.w800, color: kBlack)),
+          ]),
+          const SizedBox(height: 6),
+          Row(children: [
+            Expanded(
+                child: DateField(data, nextDateKey, '날짜', onChanged: _c)),
+            const SizedBox(width: 6),
+            Expanded(
+                child: DropdownField(data, nextTimeKey, '시간', timeOptions,
+                    onChanged: _c)),
+          ]),
+        ]),
+      ),
       const SizedBox(height: 4),
       Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Expanded(child: _signBox('회원 서명', memberName, '${p}_msign', '${p}_mfont')),

@@ -286,7 +286,9 @@ class OtFormPreview extends StatelessWidget {
         const SizedBox(height: 4),
         Row(children: [
           const Text('다음오티 ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
-          _v('${p}_next'),
+          _v(i < 3 ? 'os${i + 1}_date' : 'os3_ndate'),
+          const SizedBox(width: 6),
+          _v(i < 3 ? 'os${i + 1}_time' : 'os3_ntime'),
         ]),
         const SizedBox(height: 4),
         Row(crossAxisAlignment: CrossAxisAlignment.center, children: [

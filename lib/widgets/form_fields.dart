@@ -106,6 +106,8 @@ class DropdownField extends StatelessWidget {
         children: [
           fieldLabel(label),
           DropdownButtonFormField<String>(
+            // 값이 외부(자동입력)로 바뀌어도 화면에 반영되도록 값 기반 key 사용
+            key: ValueKey('$field:$cur'),
             initialValue: options.contains(cur) ? cur : null,
             isExpanded: true,
             decoration: const InputDecoration(isDense: true),
