@@ -39,8 +39,18 @@ flutter build web
 - `?role=member|admin|trainer` : 시작 역할
 - `?view=list` : 관리자 화면을 목록형으로 시작
 
+## 구글 드라이브 연동 (실시간)
+
+상단 메뉴(⋮) → **구글 드라이브 연동** 에서 내 구글 드라이브의 모든 스프레드시트
+(OT배정명단·오티/리뉴 관리표·마케팅관리표 등)를 실시간으로 조회할 수 있습니다.
+
+- 브라우저 Google Identity Services(OAuth) 팝업으로 인증 — 백엔드 불필요
+- Google Drive API(목록) + Google Sheets API(탭·셀 값)를 **읽기 전용**으로 호출
+- 최초 1회 OAuth 클라이언트 ID 입력이 필요합니다 → **[GOOGLE_SETUP.md](GOOGLE_SETUP.md)** 참고
+
 ## 다음 단계
 
+- 시트 데이터를 앱 내부 회원/OT 레코드로 가져오기(가져오기 매핑) 또는 쓰기 연동
 - Firebase 연결(실시간 다기기 공유 + 트레이너 푸시 알림)
 - 웹 배포(주소 발급), 이후 동일 코드로 안드로이드/iOS 앱
 
