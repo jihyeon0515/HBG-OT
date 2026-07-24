@@ -63,6 +63,7 @@ flutter:
   assets:
     - assets/body.jpg
     - assets/logo.png
+    - assets/logo_white.png
 
   # 서명용 손글씨 글꼴 (OFL, Google Fonts)
   fonts:

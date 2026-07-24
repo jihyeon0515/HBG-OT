@@ -64,7 +64,12 @@ class RootShell extends StatelessWidget {
     final app = context.watch<AppState>();
     return Scaffold(
       appBar: AppBar(
-        title: const Text('🏋️ 헬스보이짐 분당정자점'),
+        title: Row(mainAxisSize: MainAxisSize.min, children: [
+          Image.asset('assets/logo_white.png', height: 26),
+          const SizedBox(width: 10),
+          const Text('헬스보이짐 분당정자점',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
+        ]),
         actions: [
           if (app.role == Role.trainer) _trainerPicker(context, app),
           PopupMenuButton<String>(
