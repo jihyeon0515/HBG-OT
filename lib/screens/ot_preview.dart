@@ -269,11 +269,17 @@ class OtFormPreview extends StatelessWidget {
     );
   }
 
-  // 서명: 직접 그린 서명을 렌더 (없으면 밑줄)
+  // 서명: 직접 그린 서명 또는 필기체 이름 (없으면 밑줄)
   Widget _signText(String signKey, String fontKey) {
     final draw = data['${signKey}_draw'];
     if (draw is List && draw.isNotEmpty) {
       return SignatureView(strokes: draw, width: 96, height: 34);
+    }
+    final name = _s(signKey);
+    if (name.isNotEmpty) {
+      return Text(name,
+          style: const TextStyle(
+              fontFamily: 'NanumBrush', fontSize: 20, color: _blue));
     }
     return const Text('___',
         style: TextStyle(fontSize: 12, color: Colors.black38));

@@ -483,13 +483,62 @@ class _TrainerOtPageState extends State<TrainerOtPage> {
       Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Expanded(child: _signBox('회원 서명', '${p}_msign')),
         const SizedBox(width: 10),
-        Expanded(child: _signBox('관리자 서명', '${p}_asign')),
+        Expanded(
+            child: _signBox('관리자 서명', '${p}_asign',
+                draw: false, cursiveName: '백동빈')),
       ]),
     ]);
   }
 
-  /// 직접 그리는 서명칸 — 탭하면 그리기 창이 열리고, 그린 서명을 이미지로 표시
-  Widget _signBox(String label, String signKey) {
+  /// 서명칸.
+  /// draw=true  → 탭하면 그리기 창이 열려 직접 그린 서명을 이미지로 표시(회원)
+  /// draw=false → 탭하면 지정 이름이 필기체로 서명됨(관리자)
+  Widget _signBox(String label, String signKey,
+      {bool draw = true, String cursiveName = ''}) {
+    if (!draw) {
+      final signed = (data[signKey] ?? '').toString().isNotEmpty;
+      return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 5),
+          child: Text(label,
+              style: const TextStyle(
+                  fontSize: 12.5, fontWeight: FontWeight.w700, color: kInk)),
+        ),
+        InkWell(
+          onTap: () => setState(() => data[signKey] = cursiveName),
+          child: Container(
+            width: double.infinity,
+            height: 66,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: const Color(0xFFFCFCFA),
+              border: Border.all(color: signed ? kYellowDark : kBorder),
+              borderRadius: BorderRadius.circular(9),
+            ),
+            child: signed
+                ? Text(data[signKey].toString(),
+                    style: const TextStyle(
+                        fontFamily: 'NanumBrush',
+                        fontSize: 30,
+                        color: kInk,
+                        height: 1.0))
+                : const Text('여기를 눌러 서명',
+                    style: TextStyle(fontSize: 11.5, color: kMuted)),
+          ),
+        ),
+        if (signed)
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              onPressed: () => setState(() => data[signKey] = ''),
+              style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  minimumSize: const Size(0, 30)),
+              child: const Text('지우기', style: TextStyle(fontSize: 11)),
+            ),
+          ),
+      ]);
+    }
     final drawKey = '${signKey}_draw';
     final strokes = data[drawKey];
     final signed = strokes is List && strokes.isNotEmpty;
