@@ -6,6 +6,11 @@ import '../models/options.dart';
 import '../theme.dart';
 import '../widgets/form_fields.dart';
 
+// 종이 문진표 색
+const _blue = Color(0xFF0B3F8F);
+const _line = Color(0xFF222222);
+const _hdrFill = Color(0xFFFFF3C4);
+
 class MemberFormScreen extends StatefulWidget {
   const MemberFormScreen({super.key});
   @override
@@ -14,6 +19,7 @@ class MemberFormScreen extends StatefulWidget {
 
 class _MemberFormScreenState extends State<MemberFormScreen> {
   Map<String, dynamic> data = {};
+  int _epoch = 0; // 제출 후 입력칸 초기화용
   void _c() => setState(() {});
 
   void _submit() {
@@ -32,7 +38,10 @@ class _MemberFormScreenState extends State<MemberFormScreen> {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              setState(() => data = {});
+              setState(() {
+                data = {};
+                _epoch++;
+              });
             },
             child: const Text('확인'),
           )
@@ -41,87 +50,150 @@ class _MemberFormScreenState extends State<MemberFormScreen> {
     );
   }
 
+  // ---------------------------------------------------------------
+  // 종이 양식(이미지) 인터랙티브 요소
+  // ---------------------------------------------------------------
+  Widget _psection(String title, List<Widget> rows) => Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        decoration: BoxDecoration(border: Border.all(color: _line, width: 1.2)),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          Container(
+            color: _hdrFill,
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+            child: Text(title,
+                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12.5)),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(9),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start, children: rows),
+          ),
+        ]),
+      );
+
+  Widget _plabel(String t) => Padding(
+        padding: const EdgeInsets.only(top: 2, bottom: 4),
+        child: Text(t,
+            style: const TextStyle(
+                fontSize: 11.5, fontWeight: FontWeight.w800, color: Colors.black87)),
+      );
+
+  Widget _pkv(String label, Widget value, {double labelW = 78}) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+          SizedBox(
+              width: labelW,
+              child: Text(label,
+                  style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700))),
+          Expanded(child: value),
+        ]),
+      );
+
+  /// 체크박스형 선택 (탭하면 ☑/☐ 토글). column=true 면 한 줄에 하나씩.
+  Widget _pchk(String field, List<String> opts,
+      {bool multi = true, bool column = false}) {
+    Set<String> sel() {
+      if (multi) {
+        final v = data[field];
+        return v is List ? v.map((e) => e.toString()).toSet() : <String>{};
+      }
+      return data[field] != null && data[field].toString().isNotEmpty
+          ? {data[field].toString()}
+          : <String>{};
+    }
+
+    final s = sel();
+    Widget item(String o) {
+      final on = s.contains(o);
+      final box = Text(on ? '☑' : '☐',
+          style: TextStyle(
+              fontSize: 15,
+              color: on ? _blue : Colors.black45,
+              fontWeight: FontWeight.w700));
+      final txt = Text(o,
+          style: TextStyle(
+              fontSize: 12.5,
+              color: on ? _blue : Colors.black87,
+              fontWeight: on ? FontWeight.w700 : FontWeight.w400));
+      return InkWell(
+        onTap: () {
+          if (multi) {
+            final list = (data[field] is List)
+                ? List<String>.from(data[field])
+                : <String>[];
+            on ? list.remove(o) : list.add(o);
+            data[field] = list;
+          } else {
+            data[field] = on ? null : o;
+          }
+          _c();
+        },
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: column ? 3 : 1),
+          child: Row(
+            mainAxisSize: column ? MainAxisSize.max : MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              box,
+              const SizedBox(width: 3),
+              column ? Expanded(child: txt) : txt,
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (column) {
+      return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: opts.map(item).toList());
+    }
+    return Wrap(spacing: 12, runSpacing: 4, children: opts.map(item).toList());
+  }
+
+  /// 밑줄형 직접 입력칸
+  Widget _ptext(String field,
+      {String hint = '', int maxLines = 1, TextInputType? kb}) {
+    return TextFormField(
+      key: ValueKey('$field-$_epoch'),
+      initialValue: (data[field] ?? '').toString(),
+      maxLines: maxLines,
+      keyboardType: kb,
+      style: const TextStyle(
+          fontSize: 12.5, color: _blue, fontWeight: FontWeight.w700),
+      decoration: InputDecoration(
+        isDense: true,
+        hintText: hint,
+        hintStyle:
+            const TextStyle(color: Colors.black38, fontWeight: FontWeight.w400),
+        contentPadding: const EdgeInsets.symmetric(vertical: 4),
+        enabledBorder: const UnderlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFFBBBBBB))),
+        focusedBorder:
+            const UnderlineInputBorder(borderSide: BorderSide(color: _blue)),
+      ),
+      onChanged: (v) => data[field] = v,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final sec1 = FormSection(title: '① 기본 정보', children: [
-      // 구분 · 희망종목
-      Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Expanded(child: ChipsField(data, 'member_type', '구분', memberTypeOptions, multi: false, onChanged: _c)),
-        const SizedBox(width: 10),
-        Expanded(child: ChipsField(data, 'jongmok', '희망종목', jongmokOptions, multi: false, onChanged: _c)),
-      ]),
-      // 이름 · 연락처 · 성별 · 나이 (좁으면 2줄로 줄바꿈)
-      LayoutBuilder(builder: (ctx, cons) {
-        final row1 = [
-          Expanded(flex: 3, child: TextField2(data, 'name', '이름', onChanged: _c)),
-          const SizedBox(width: 10),
-          Expanded(flex: 4, child: TextField2(data, 'phone', '연락처', keyboardType: TextInputType.phone, onChanged: _c)),
-        ];
-        final row2 = [
-          Expanded(flex: 2, child: ChipsField(data, 'gender', '성별', genders, multi: false, onChanged: _c)),
-          const SizedBox(width: 10),
-          Expanded(flex: 2, child: TextField2(data, 'age', '나이', keyboardType: TextInputType.number, onChanged: _c)),
-        ];
-        if (cons.maxWidth < 520) {
-          return Column(children: [
-            Row(crossAxisAlignment: CrossAxisAlignment.start, children: row1),
-            Row(crossAxisAlignment: CrossAxisAlignment.start, children: row2),
-          ]);
-        }
-        return Row(crossAxisAlignment: CrossAxisAlignment.start,
-            children: [...row1, const SizedBox(width: 10), ...row2]);
-      }),
-      // 직업 · 운동 시간대
-      Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Expanded(child: TextField2(data, 'job', '직업', onChanged: _c)),
-        const SizedBox(width: 10),
-        Expanded(child: TextField2(data, 'etime', '운동 시간대', onChanged: _c)),
-      ]),
-    ]);
-    final sec2 = FormSection(title: '② 방문 계기 & 운동목적 (중복선택)', children: [
-      ChipsField(data, 'visit_reason', '헬스보이짐 분당정자점을 방문하게 된 계기',
-          visitReasonOptions, onChanged: _c),
-      const SizedBox(height: 4),
-      ChipsField(data, 'purpose', '운동목적', purposeOptions, onChanged: _c),
-    ]);
-    final sec3 = FormSection(title: '③ 건강 & 병력사항 (중복선택)', children: [
-      ChipsField(data, 'history', '병력사항', historyOptions, onChanged: _c),
-      TextField2(data, 'history_etc', '기타 병력 / 수술 이력', onChanged: _c),
-    ]);
-    final sec4 = FormSection(title: '④ 운동 경험 (중복선택)', children: [
-      ChipsField(data, 'exp', '운동경험', expOptions, onChanged: _c),
-      ChipsField(data, 'career', '운동경력', careerOptions, multi: false, onChanged: _c),
-      ChipsField(data, 'ptsat', 'PT 경험 만족도', ptSatOptions, multi: false, onChanged: _c),
-      TextField2(data, 'ptreason_txt', 'PT 만족 / 불만족 이유', maxLines: 2, onChanged: _c),
-    ]);
-    final sec5 = FormSection(title: '⑤ 운동 성격 (중복선택)', children: [
-      ChipsField(data, 'persona', '', personaOptions, onChanged: _c),
-    ]);
-    final sec6 = FormSection(title: '⑥ 특이사항', children: [
-      TextField2(data, 'member_note',
-          '통증 부위, 알레르기, 원하는 시간대 등 트레이너에게 전할 내용 (선택)',
-          maxLines: 4, onChanged: _c),
-    ]);
-    final rest = [sec2, sec3, sec4, sec5, sec6];
-
     return Column(
       children: [
         Expanded(
           child: Center(
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1200),
+              constraints: const BoxConstraints(maxWidth: 720),
               child: ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.only(bottom: 6),
-                    child: Text('신규회원 상담 문진표',
-                        style: TextStyle(fontSize: 23, fontWeight: FontWeight.w900)),
-                  ),
+                  const Text('신규회원 상담 문진표',
+                      style: TextStyle(fontSize: 23, fontWeight: FontWeight.w900)),
+                  const SizedBox(height: 4),
                   const Text('아래 항목을 작성 후 제출해주세요.',
                       style: TextStyle(color: Colors.black54, fontSize: 14)),
-                  const SizedBox(height: 10),
-                  // 상담직원 · 등록종목 (문진표 제목 바로 아래)
+                  const SizedBox(height: 12),
+                  // 상담직원 · 등록종목 (이미지 제외 — 일반 드롭다운)
                   Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Expanded(
                         child: DropdownField(
@@ -131,22 +203,90 @@ class _MemberFormScreenState extends State<MemberFormScreen> {
                         child: DropdownField(data, 'reg_item', '등록종목',
                             regItemOptions, onChanged: _c)),
                   ]),
-                  const SizedBox(height: 10),
-                  sec1,
-                  // 넓은 화면(가로 태블릿) 2열 / 좁은 화면 1열 자동 줄바꿈
-                  LayoutBuilder(builder: (ctx, cons) {
-                    if (cons.maxWidth < 900) return Column(children: rest);
-                    // 좌: 방문계기·운동경험 / 우: 건강병력·운동성격·특이사항
-                    // (특이사항을 운동성격 아래 빈 자리에 배치)
-                    return Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(child: Column(children: [sec2, sec4])),
-                        const SizedBox(width: 12),
-                        Expanded(child: Column(children: [sec3, sec5, sec6])),
-                      ],
-                    );
-                  }),
+                  const SizedBox(height: 12),
+                  // ===== 종이 양식(이미지) — 각 칸 탭하여 선택/입력 =====
+                  Container(
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: _line, width: 1.4),
+                        borderRadius: BorderRadius.circular(6)),
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(children: [
+                            Image.asset('assets/logo.png', height: 30),
+                            const SizedBox(width: 8),
+                            const Text('상담 문진표',
+                                style: TextStyle(
+                                    fontSize: 15, fontWeight: FontWeight.w900)),
+                          ]),
+                          Container(
+                              height: 4,
+                              color: _line,
+                              margin: const EdgeInsets.symmetric(vertical: 8)),
+                          // 회원 정보
+                          _psection('회원 정보', [
+                            _pkv('구분',
+                                _pchk('member_type', memberTypeOptions, multi: false)),
+                            _pkv('희망종목',
+                                _pchk('jongmok', jongmokOptions, multi: false)),
+                            _pkv('이름', _ptext('name', hint: '이름')),
+                            _pkv('연락처',
+                                _ptext('phone', hint: '010-0000-0000', kb: TextInputType.phone)),
+                            _pkv('성별', _pchk('gender', genders, multi: false)),
+                            _pkv(
+                                '나이',
+                                Row(children: [
+                                  SizedBox(
+                                      width: 70,
+                                      child: _ptext('age', kb: TextInputType.number)),
+                                  const SizedBox(width: 4),
+                                  const Text('세', style: TextStyle(fontSize: 12)),
+                                ])),
+                            _pkv('직업', _ptext('job')),
+                            _pkv('운동시간대', _ptext('etime', hint: '예: 평일 저녁')),
+                          ]),
+                          // 방문 계기 & 운동목적
+                          _psection('방문 계기 & 운동목적 (중복선택)', [
+                            _plabel('헬스보이짐 분당정자점을 방문하게 된 계기'),
+                            _pchk('visit_reason', visitReasonOptions),
+                            const SizedBox(height: 8),
+                            _plabel('운동목적'),
+                            _pchk('purpose', purposeOptions),
+                          ]),
+                          // 건강 & 병력사항
+                          _psection('건강 & 병력사항 (중복선택)', [
+                            _pchk('history', historyOptions),
+                            const SizedBox(height: 6),
+                            _pkv('기타 병력·수술', _ptext('history_etc'), labelW: 84),
+                          ]),
+                          // 운동 경험
+                          _psection('운동 경험 (중복선택)', [
+                            _plabel('운동경험'),
+                            _pchk('exp', expOptions),
+                            const SizedBox(height: 8),
+                            _plabel('운동경력'),
+                            _pchk('career', careerOptions, multi: false),
+                            const SizedBox(height: 8),
+                            _plabel('PT 경험 만족도'),
+                            _pchk('ptsat', ptSatOptions, multi: false),
+                            const SizedBox(height: 6),
+                            _pkv('PT 만족·불만족 이유', _ptext('ptreason_txt', maxLines: 2),
+                                labelW: 110),
+                          ]),
+                          // 운동 성격
+                          _psection('운동 성격 (중복선택)', [
+                            _pchk('persona', personaOptions, column: true),
+                          ]),
+                          // 특이사항
+                          _psection('특이사항', [
+                            _ptext('member_note',
+                                hint: '통증 부위, 알레르기, 원하는 시간대 등 트레이너에게 전할 내용 (선택)',
+                                maxLines: 3),
+                          ]),
+                        ]),
+                  ),
                   const SizedBox(height: 80),
                 ],
               ),
@@ -158,7 +298,7 @@ class _MemberFormScreenState extends State<MemberFormScreen> {
             padding: const EdgeInsets.fromLTRB(16, 6, 16, 10),
             child: Center(
               child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 1200),
+                constraints: const BoxConstraints(maxWidth: 720),
                 child: SizedBox(
                   width: double.infinity,
                   height: 56,
