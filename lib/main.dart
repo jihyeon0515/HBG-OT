@@ -65,15 +65,10 @@ class RootShell extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         titleSpacing: 12,
-        title: Row(mainAxisSize: MainAxisSize.min, children: [
-          Image.asset('assets/logo_full.png', height: 18),
-          const SizedBox(width: 10),
-          const Flexible(
-            child: Text('헬스보이짐 분당정자점',
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
-          ),
-        ]),
+        title: Align(
+          alignment: Alignment.centerLeft,
+          child: Image.asset('assets/logo_full.png', height: 18),
+        ),
         actions: [
           if (app.role == Role.trainer) _trainerPicker(context, app),
           PopupMenuButton<String>(
