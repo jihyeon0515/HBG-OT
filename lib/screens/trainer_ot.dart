@@ -224,16 +224,8 @@ class _TrainerOtPageState extends State<TrainerOtPage> {
                 onChanged: _c)),
       ]),
       TextField2(data, '${p}_prog', '운동 프로그램 내용', maxLines: 3, onChanged: _c),
-      TextField2(data, '${p}_sets', '세트 요약 (예: 40kg x 3 / …)', onChanged: _c),
       TextField2(data, '${p}_tip', 'tip 메모', maxLines: 2, onChanged: _c),
-      Row(children: [
-        Expanded(child: DateField(data, '${p}_next', '다음 오티 일정', onChanged: _c)),
-        const SizedBox(width: 6),
-        Expanded(
-            child: DropdownField(data, '${p}_ctime', '유산소 시간',
-                cardioTimeOptions, onChanged: _c)),
-      ]),
-      ChipsField(data, '${p}_cardio', '유산소 종류 (중복)', cardioOptions, onChanged: _c),
+      DateField(data, '${p}_next', '다음 오티 일정', onChanged: _c),
       const SizedBox(height: 4),
       Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Expanded(child: _signBox('회원 서명', memberName, '${p}_msign', '${p}_mfont')),

@@ -157,7 +157,6 @@ class OtFormPreview extends StatelessWidget {
   // ------------------------------------------------------------------
   Widget _programSheet() {
     final gender = _s('gender');
-    final cardioAll = ['런닝머신', '싸이클', '스텝퍼', '스텝밀', '마이마운틴'];
     return Container(
       decoration: _paper,
       padding: const EdgeInsets.all(12),
@@ -238,7 +237,7 @@ class OtFormPreview extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           // 회차 3개
-          for (var i = 1; i <= 3; i++) _sessionBlock(i, cardioAll),
+          for (var i = 1; i <= 3; i++) _sessionBlock(i),
           const SizedBox(height: 4),
           Center(child: Image.asset('assets/logo.png', height: 26)),
         ],
@@ -255,10 +254,8 @@ class OtFormPreview extends StatelessWidget {
         ]),
       );
 
-  Widget _sessionBlock(int i, List<String> cardioAll) {
+  Widget _sessionBlock(int i) {
     final p = 'os$i';
-    final cardio = data['${p}_cardio'];
-    final selCardio = cardio is List ? cardio.map((e) => e.toString()).toSet() : <String>{};
     return Container(
       margin: const EdgeInsets.only(bottom: 7),
       decoration: BoxDecoration(border: Border.all(color: _line, width: 1.2)),
@@ -280,14 +277,6 @@ class OtFormPreview extends StatelessWidget {
         ]),
         const SizedBox(height: 5),
         _multiline('${p}_prog', '운동 프로그램'),
-        if (_has('${p}_sets'))
-          Padding(
-            padding: const EdgeInsets.only(top: 3),
-            child: Row(children: [
-              const Text('세트: ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
-              Expanded(child: Text(_s('${p}_sets'), style: const TextStyle(fontSize: 11.5, color: _blue))),
-            ]),
-          ),
         if (_has('${p}_tip'))
           Padding(
             padding: const EdgeInsets.only(top: 3),
@@ -296,13 +285,6 @@ class OtFormPreview extends StatelessWidget {
           ),
         const SizedBox(height: 4),
         Row(children: [
-          const Text('유산소 ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
-          ...cardioAll.map((c) => _chk(selCardio.contains(c), c)),
-        ]),
-        Row(children: [
-          const Text('시간 ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
-          _v('${p}_ctime'),
-          const SizedBox(width: 12),
           const Text('다음오티 ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
           _v('${p}_next'),
         ]),
