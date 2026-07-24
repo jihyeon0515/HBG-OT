@@ -858,6 +858,7 @@ class AdminDetailPage extends StatelessWidget {
             sub: sub,
             editableNote: true,
             onNoteChanged: (v) => s.updateData(sub.id, {'admin_note': v}),
+            onDataChanged: (patch) => s.updateData(sub.id, patch),
             assignHeader: TrainerAssignBox(
               current: sub.assignedTrainer,
               onAssign: (t) {

@@ -213,12 +213,14 @@ class SubmissionView extends StatelessWidget {
   final bool editableNote;
   final ValueChanged<String>? onNoteChanged;
   final Widget? assignHeader; // 상태 헤더 우측(담당 배정 박스)
+  final void Function(Map<String, dynamic> patch)? onDataChanged; // 관리자 서명 등
   const SubmissionView(
       {super.key,
       required this.sub,
       this.editableNote = false,
       this.onNoteChanged,
-      this.assignHeader});
+      this.assignHeader,
+      this.onDataChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -244,6 +246,9 @@ class SubmissionView extends StatelessWidget {
                 memberName: sub.memberName,
                 trainerName: sub.assignedTrainer ?? ''),
           ),
+          // 관리자 서명 (관리자 페이지에서만 서명 가능)
+          if (editableNote)
+            AdminSignPanel(data: d, onChanged: onDataChanged),
         ],
       ],
     );
@@ -324,6 +329,95 @@ class SubmissionView extends StatelessWidget {
                       ]);
               }),
       ),
+    );
+  }
+}
+
+/// 관리자 서명 패널 — 관리자 페이지에서 회차별 관리자 서명(백동빈, 필기체)을 입력
+class AdminSignPanel extends StatelessWidget {
+  final Map data;
+  final void Function(Map<String, dynamic> patch)? onChanged;
+  const AdminSignPanel({super.key, required this.data, this.onChanged});
+
+  bool _active(int i) {
+    final d = (data['os${i}_date'] ?? '').toString();
+    final p = (data['os${i}_prog'] ?? '').toString();
+    final ms = data['os${i}_msign_draw'];
+    return d.isNotEmpty ||
+        p.isNotEmpty ||
+        (ms is List && ms.isNotEmpty) ||
+        (data['os${i}_asign'] ?? '').toString().isNotEmpty;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final sessions = [for (var i = 1; i <= 3; i++) if (_active(i)) i];
+    if (sessions.isEmpty) return const SizedBox.shrink();
+    return Container(
+      margin: const EdgeInsets.only(top: 12),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: kYellow.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: kYellowDark),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const Row(children: [
+          Icon(Icons.draw, size: 17, color: kBlack),
+          SizedBox(width: 6),
+          Text('관리자 서명',
+              style: TextStyle(
+                  fontWeight: FontWeight.w900, fontSize: 15, color: kBlack)),
+        ]),
+        const SizedBox(height: 4),
+        const Text('회차별 서명란을 터치하면 관리자(백동빈) 서명이 입력됩니다.',
+            style: TextStyle(fontSize: 11.5, color: kMuted)),
+        const SizedBox(height: 10),
+        for (final i in sessions) _row(i),
+      ]),
+    );
+  }
+
+  Widget _row(int i) {
+    final key = 'os${i}_asign';
+    final signed = (data[key] ?? '').toString().isNotEmpty;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(children: [
+        SizedBox(
+            width: 48,
+            child: Text('$i회차',
+                style: const TextStyle(
+                    fontSize: 12.5, fontWeight: FontWeight.w800))),
+        Expanded(
+          child: InkWell(
+            onTap: signed ? null : () => onChanged?.call({key: '백동빈'}),
+            child: Container(
+              height: 54,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: signed ? kYellowDark : kBorder),
+                borderRadius: BorderRadius.circular(9),
+              ),
+              child: signed
+                  ? Text(data[key].toString(),
+                      style: const TextStyle(
+                          fontFamily: 'NanumBrush', fontSize: 26, color: kInk))
+                  : const Text('여기를 터치해 관리자 서명',
+                      style: TextStyle(fontSize: 11.5, color: kMuted)),
+            ),
+          ),
+        ),
+        if (signed)
+          TextButton(
+            onPressed: () => onChanged?.call({key: ''}),
+            style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 6),
+                minimumSize: const Size(0, 30)),
+            child: const Text('지우기', style: TextStyle(fontSize: 11)),
+          ),
+      ]),
     );
   }
 }
