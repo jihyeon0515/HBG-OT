@@ -155,8 +155,8 @@ class _TrainerOtPageState extends State<TrainerOtPage> {
           ]),
           for (var i = 1; i <= 3; i++) _sessionSection(i),
           FormSection(title: '③ 특이사항 메모', children: [
-            TextField2(data, 'trainer_note',
-                '통증·부상·주의사항 등 트레이너 메모', maxLines: 3, onChanged: _c),
+            TextField2(data, 'trainer_note', '트레이너 메모',
+                maxLines: 3, onChanged: _c),
           ]),
           // ---- 오티문진표 미리보기 (입력값 실시간 반영) ----
           const SizedBox(height: 6),
@@ -252,7 +252,7 @@ class _TrainerOtPageState extends State<TrainerOtPage> {
                 onChanged: _c)),
       ]),
       TextField2(data, '${p}_prog', '운동 프로그램 내용', maxLines: 3, onChanged: _c),
-      TextField2(data, '${p}_tip', 'tip 메모', maxLines: 2, onChanged: _c),
+      TextField2(data, '${p}_tip', '메모', maxLines: 2, onChanged: _c),
       // 다음 오티 일정 (날짜 + 시간 드롭다운)
       Container(
         margin: const EdgeInsets.only(top: 4, bottom: 6),

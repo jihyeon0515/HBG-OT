@@ -91425,7 +91425,7 @@ c=b.c
 c.toString
 c=A.qq(c,!1,p).c
 l=c==null?"\uad00\ub9ac\uc790":c
-q.push(new A.ek("\u2461-"+o+"  "+o+"\ud68c\ucc28 \uc624\ud2f0",A.b([i,new A.vt(g,m+"_prog","\uc6b4\ub3d9 \ud504\ub85c\uadf8\ub7a8 \ub0b4\uc6a9",3,a,r,a),new A.vt(g,m+"_tip","tip \uba54\ubaa8",2,a,r,a),f,B.cv,A.bf(A.b([new A.hY(1,B.c2,h,a),B.cu,new A.hY(1,B.c2,b.Tw("\uad00\ub9ac\uc790 \uc11c\uba85",l,m+"_asign",m+"_afont"),a)],s),B.G,B.m,B.n,0)],s),a))}q.push(new A.ek("\u2462 \ud2b9\uc774\uc0ac\ud56d \uba54\ubaa8",A.b([A.kd(b.d,"trainer_note","\ud1b5\uc99d\xb7\ubd80\uc0c1\xb7\uc8fc\uc758\uc0ac\ud56d \ub4f1 \ud2b8\ub808\uc774\ub108 \uba54\ubaa8",a,3,r)],s),a))
+q.push(new A.ek("\u2461-"+o+"  "+o+"\ud68c\ucc28 \uc624\ud2f0",A.b([i,new A.vt(g,m+"_prog","\uc6b4\ub3d9 \ud504\ub85c\uadf8\ub7a8 \ub0b4\uc6a9",3,a,r,a),new A.vt(g,m+"_tip","\uba54\ubaa8",2,a,r,a),f,B.cv,A.bf(A.b([new A.hY(1,B.c2,h,a),B.cu,new A.hY(1,B.c2,b.Tw("\uad00\ub9ac\uc790 \uc11c\uba85",l,m+"_asign",m+"_afont"),a)],s),B.G,B.m,B.n,0)],s),a))}q.push(new A.ek("\u2462 \ud2b9\uc774\uc0ac\ud56d \uba54\ubaa8",A.b([A.kd(b.d,"trainer_note","\ud2b8\ub808\uc774\ub108 \uba54\ubaa8",a,3,r)],s),a))
 q.push(B.dC)
 q.push(A.bf(A.b([A.aS(a,a,B.l,a,a,new A.bi(B.a7,a,a,A.bL(3),a,a,B.A),a,20,a,a,a,a,5),B.br,B.a_g],s),B.r,B.m,B.n,0))
 q.push(B.cv)
