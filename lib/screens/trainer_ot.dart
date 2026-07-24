@@ -6,7 +6,6 @@ import '../models/options.dart';
 import '../models/submission.dart';
 import '../theme.dart';
 import 'member_preview.dart';
-import 'ot_preview.dart';
 import 'submission_view.dart';
 
 // 종이 양식 색
@@ -155,35 +154,8 @@ class _TrainerOtPageState extends State<TrainerOtPage> {
           SpecialNoteBox(data: data, editable: false),
           const SizedBox(height: 12),
           _trainerHeader(),
-          // 트레이너 작성 — 종이 양식(이미지) 인터랙티브 폼
+          // 트레이너 작성 — 회원 상담문진표와 동일한 종이 양식(수정 가능한 이미지)
           _trainerPaper(),
-          // ---- 오티문진표 미리보기 (입력값 실시간 반영) ----
-          const SizedBox(height: 6),
-          Row(children: [
-            Container(
-              width: 5, height: 20,
-              decoration: BoxDecoration(color: kYellow, borderRadius: BorderRadius.circular(3)),
-            ),
-            const SizedBox(width: 8),
-            const Text('📋 오티문진표 미리보기',
-                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: kInk)),
-          ]),
-          const SizedBox(height: 4),
-          const Text('입력하신 내용이 실시간 반영됩니다. 미리보기를 누르면 전체 화면으로 볼 수 있습니다.',
-              style: TextStyle(fontSize: 12, color: kMuted)),
-          const SizedBox(height: 12),
-          // OT 회차별 기록 미리보기 (회원 작성 내용은 상단에 이미지로 표시됨)
-          const Text('OT 회차별 기록 미리보기',
-              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5, color: kInk)),
-          const SizedBox(height: 6),
-          PreviewThumbnail(
-            title: '$memberName · OT 회차별 기록',
-            builder: () => OtFormPreview(
-              data: data,
-              memberName: memberName,
-              trainerName: context.read<AppState>().currentTrainer ?? '',
-            ),
-          ),
           const SizedBox(height: 16),
           const Text('OT 완료 처리 — 성공/실패를 선택하세요',
               style: TextStyle(fontWeight: FontWeight.w800, color: kMuted, fontSize: 13)),
