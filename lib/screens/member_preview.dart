@@ -83,6 +83,18 @@ class MemberFormView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(children: [
+      // 상담직원 (문진표 상단)
+      Padding(
+        padding: const EdgeInsets.only(bottom: 8, right: 2),
+        child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+          const Text('상담직원 : ',
+              style: TextStyle(
+                  fontSize: 12.5, fontWeight: FontWeight.w700, color: kMuted)),
+          Text(_s('staff').isEmpty ? '-' : _s('staff'),
+              style: const TextStyle(
+                  fontSize: 13, fontWeight: FontWeight.w800, color: kInk)),
+        ]),
+      ),
       FormSection(title: '① 기본 정보', children: [
         LayoutBuilder(builder: (ctx, c) {
           // 화면(칸) 폭이 좁으면(모바일) 줄을 나눠 성별 칩이 세로로 눌리지 않게 함
@@ -158,18 +170,6 @@ class MemberFormView extends StatelessWidget {
       FormSection(title: '⑥ 특이사항', children: [
         _text('회원 작성', 'member_note', maxLines: 3),
       ]),
-      // 하단 — 상담직원
-      Padding(
-        padding: const EdgeInsets.only(top: 2, right: 2),
-        child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-          const Text('상담직원 : ',
-              style: TextStyle(
-                  fontSize: 12.5, fontWeight: FontWeight.w700, color: kMuted)),
-          Text(_s('staff').isEmpty ? '-' : _s('staff'),
-              style: const TextStyle(
-                  fontSize: 13, fontWeight: FontWeight.w800, color: kInk)),
-        ]),
-      ),
     ]);
   }
 }
@@ -271,8 +271,19 @@ class MemberFormPreview extends StatelessWidget {
         Row(children: [
           Image.asset('assets/logo.png', height: 34),
           const SizedBox(width: 10),
-          const Text('신규회원 상담 문진표',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              const Text('신규회원 상담 문진표',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
+              Row(children: [
+                const Text('상담직원 : ',
+                    style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700)),
+                Text(_s('staff').isEmpty ? '________' : _s('staff'),
+                    style: const TextStyle(
+                        fontSize: 12, color: _blue, fontWeight: FontWeight.w700)),
+              ]),
+            ]),
+          ),
         ]),
         Container(height: 5, color: _line, margin: const EdgeInsets.symmetric(vertical: 8)),
         _section('회원 정보', [
@@ -321,17 +332,6 @@ class MemberFormPreview extends StatelessWidget {
           Text(_s('member_note').isEmpty ? '-' : _s('member_note'),
               style: const TextStyle(color: _blue, fontWeight: FontWeight.w600, fontSize: 12)),
         ]),
-        // 하단 — 상담직원
-        Padding(
-          padding: const EdgeInsets.only(top: 6, right: 2),
-          child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-            const Text('상담직원 : ',
-                style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700)),
-            Text(_s('staff').isEmpty ? '________' : _s('staff'),
-                style: const TextStyle(
-                    fontSize: 12, color: _blue, fontWeight: FontWeight.w700)),
-          ]),
-        ),
       ]),
     );
   }
