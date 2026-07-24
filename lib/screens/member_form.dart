@@ -121,15 +121,16 @@ class _MemberFormScreenState extends State<MemberFormScreen> {
                   const Text('아래 항목을 작성 후 제출해주세요.',
                       style: TextStyle(color: Colors.black54, fontSize: 14)),
                   const SizedBox(height: 10),
-                  // 상담직원 (문진표 제목 바로 아래)
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: SizedBox(
-                      width: 240,
-                      child: DropdownField(
-                          data, 'staff', '상담직원', staffList, onChanged: _c),
-                    ),
-                  ),
+                  // 상담직원 · 등록종목 (문진표 제목 바로 아래)
+                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Expanded(
+                        child: DropdownField(
+                            data, 'staff', '상담직원', staffList, onChanged: _c)),
+                    const SizedBox(width: 10),
+                    Expanded(
+                        child: DropdownField(data, 'reg_item', '등록종목',
+                            regItemOptions, onChanged: _c)),
+                  ]),
                   const SizedBox(height: 10),
                   sec1,
                   // 넓은 화면(가로 태블릿) 2열 / 좁은 화면 1열 자동 줄바꿈

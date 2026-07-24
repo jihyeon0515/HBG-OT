@@ -83,7 +83,7 @@ class MemberFormView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(children: [
-      // 상담직원 (문진표 상단)
+      // 상담직원 · 등록종목 (문진표 상단)
       Padding(
         padding: const EdgeInsets.only(bottom: 8, right: 2),
         child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
@@ -91,6 +91,13 @@ class MemberFormView extends StatelessWidget {
               style: TextStyle(
                   fontSize: 12.5, fontWeight: FontWeight.w700, color: kMuted)),
           Text(_s('staff').isEmpty ? '-' : _s('staff'),
+              style: const TextStyle(
+                  fontSize: 13, fontWeight: FontWeight.w800, color: kInk)),
+          const SizedBox(width: 16),
+          const Text('등록종목 : ',
+              style: TextStyle(
+                  fontSize: 12.5, fontWeight: FontWeight.w700, color: kMuted)),
+          Text(_s('reg_item').isEmpty ? '-' : _s('reg_item'),
               style: const TextStyle(
                   fontSize: 13, fontWeight: FontWeight.w800, color: kInk)),
         ]),
@@ -279,6 +286,12 @@ class MemberFormPreview extends StatelessWidget {
                 const Text('상담직원 : ',
                     style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700)),
                 Text(_s('staff').isEmpty ? '________' : _s('staff'),
+                    style: const TextStyle(
+                        fontSize: 12, color: _blue, fontWeight: FontWeight.w700)),
+                const SizedBox(width: 12),
+                const Text('등록종목 : ',
+                    style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700)),
+                Text(_s('reg_item').isEmpty ? '________' : _s('reg_item'),
                     style: const TextStyle(
                         fontSize: 12, color: _blue, fontWeight: FontWeight.w700)),
               ]),

@@ -159,6 +159,7 @@ class AppState extends ChangeNotifier {
       'persona': ['운동에 지루함을 쉽게느낀다'],
       'member_note': '오른쪽 무릎에 통증이 가끔 있어요. 저녁 시간대를 선호합니다.',
       'staff': '정지현',
+      'reg_item': '헬스6개월',
     };
     createSubmission(
         {...base, 'name': '이접수', 'member_type': '신규', 'jongmok': '헬스'});
