@@ -89281,7 +89281,7 @@ A.a6i.prototype={
 $1(a){return A.aSc(this.a)},
 $S:232}
 A.Ov.prototype={
-G(a){var s=null,r=A.qf(a,!0,t.Tz),q=t.p,p=A.b5(A.b([A.M2("assets/logo_full.png",18),B.dy,B.It],q),B.q,B.l,B.n,0)
+G(a){var s=null,r=A.qf(a,!0,t.Tz),q=t.p,p=A.b5(A.b([A.M2("assets/logo_white.png",26),B.dy,B.It],q),B.q,B.l,B.n,0)
 q=A.b([],q)
 if(r.b===B.et)q.push(this.akj(a,r))
 q.push(A.aDA(B.Ja,new A.aea(),new A.aeb(this,a,r),t.N))
